@@ -29,46 +29,58 @@
     OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 -->
-<beans xmlns="http://www.springframework.org/schema/beans"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd">
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd">
 
-	<bean id="log4jInitialization"
-		class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+	<bean id="log4jInitialization" class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
 		<property name="targetClass" value="org.springframework.util.Log4jConfigurer" />
 		<property name="targetMethod" value="initLogging" />
 		<property name="arguments">
-			<list>
-				<value>config/log4j.properties</value>
+			<list>											
+				<value>config/log4j-xri-splitter.properties</value>
 			</list>
 		</property>
 	</bean>
 
+	<!-- Reference a processor bean here 
+	<bean id="someProcBean" class="edu.mit.ll.nics.processors.some.BeanProcessor">
+		<property name="someprop" value="someval" />
+	</bean>
+	-->
+
 	<camelContext id="camel" xmlns="http://camel.apache.org/schema/spring">
+		<!-- Placeholder for a properties file 
+			 Reference a property like this: "{{someProperty}}", e.g.:
+			 	<from uri="{{sourceURI}}" />
+			 When in app.properties there's an entry:
+			 	sourceURI=someuri	
+		-->
+		<propertyPlaceholder id="props" location="file:config/xri-splitter.properties" />
+		
+		<!-- Split XRI into aff and ground -->
+        <route id="SplitGroundAndAircraftRoute">
+				<!-- Ingest data from the XRI (ground and air)  -->
+        		<from uri="{{incomingXri}}" />
 
-		<propertyPlaceholder id="props"
-			location="file:config/gst2gml.properties" />
-		<route id="SplitGroundAndAircraftRoute">
-			<from uri="{{incomingXri}}" />
-			<when>
-				<simple>${body} regex
-					'.*UnitID="((H)+|(HT)+|(AA)+|(AT)+|(LP)+)+[0-9]+".*'</simple>
-				<to uri="seda:affout" />
-				<stop />
-			</when>
-			<to uri="seda:groundout" />
-		</route>
+                <when> <!-- think of this as an "if aircraft" statement -->
+                        <simple>${body} regex '.*UnitID="((H)+|(HT)+|(AA)+|(AT)+|(LP)+)+[0-9]+".*'</simple>
+                        <!-- Send to aff processor -->
+                        <to uri="seda:affout"/>
+                        <stop/> <!-- finished processing air object, exit route -->
+                </when>
+				<!-- think of this as a corresponding "else" statement, send to ground processor -->
+                <to uri="seda:groundout" /> 
+        </route>
 
-		<route id="ProcessAircraftRoute">
+		<route id="ProcessAircraftRoute" >
 			<from uri="seda:affout" />
-			<to uri="{{airTransform}}" />
-			<to uri="{{geodatafeed}}" />
+			<!--<to uri="{{affFile}}" /> -->
+			<to uri="{{rabbitAir}}" />
 		</route>
 
-		<route id="ProcessGroundRoute">
+		<route id="ProcessGroundRoute" >
 			<from uri="seda:groundout" />
-			<to uri="{{groundTransform}}" />
-			<to uri="{{geodatafeed}}" />
+			<!--<to uri="{{groundFile}}" />-->
+			<to uri="{{rabbitGround}}" />
 		</route>
 
 	</camelContext>

@@ -29,28 +29,35 @@
  */
 package edu.mit.ll.nics.processor.gml.consumer;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.sql.Timestamp;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.apache.commons.lang.time.StopWatch;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
-
-import java.sql.Timestamp;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
-
 import org.geotools.GML;
 import org.geotools.GML.Version;
-import org.geotools.data.simple.SimpleFeatureCollection;
-import org.geotools.data.simple.SimpleFeatureIterator;
-import org.geotools.data.simple.SimpleFeatureStore;
 import org.geotools.data.DataStore;
 import org.geotools.data.DataStoreFinder;
 import org.geotools.data.DefaultTransaction;
 import org.geotools.data.Transaction;
+import org.geotools.data.simple.SimpleFeatureCollection;
+import org.geotools.data.simple.SimpleFeatureIterator;
+import org.geotools.data.simple.SimpleFeatureStore;
+import org.geotools.filter.text.cql2.CQL;
+import org.geotools.geometry.jts.JTS;
+import org.geotools.referencing.CRS;
+import org.geotools.util.logging.Logging;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.filter.Filter;
@@ -58,15 +65,9 @@ import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.NoSuchAuthorityCodeException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
-import org.geotools.geometry.jts.JTS;
-import org.geotools.referencing.CRS;
-import org.geotools.util.logging.Logging;
-import org.geotools.filter.text.cql2.CQL;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Point;
-
-import java.io.*;
 
 
 public class GMLToDBProcessor implements Processor {
@@ -124,7 +125,9 @@ public class GMLToDBProcessor implements Processor {
 	 * Default: yyyy-MM-dd'T'HH:mm:ss'Z'
 	 */
 	private String dateFormatPattern = "yyyy-MM-dd'T'HH:mm:ss'Z'";
+	private String dateFormatPattern2 = "yyyy-MM-dd'T'HH:mm:ss";
 	
+	private List<String> dateFormats = new ArrayList<String>();
 	
     private String log4jPropertyFile;
 	
@@ -308,6 +311,9 @@ public class GMLToDBProcessor implements Processor {
     	
     	// Initialize the GML object to the specified version
     	gml = new GML(parseGMLVersion());
+
+    	dateFormats.add(dateFormatPattern);
+    	dateFormats.add(dateFormatPattern2);
     	
     	hasInitialized = true;
     	
@@ -357,7 +363,7 @@ public class GMLToDBProcessor implements Processor {
     @Override
     //@SuppressWarnings({"unchecked", "unchecked", "unchecked", "unchecked"})
     public void process(Exchange exchange) {
-    	
+    	System.out.println("************************************processing");
     	if(!hasInitialized && !init()) {
 			log.info("Initialization failed... shutting down.");
 			try {
@@ -618,18 +624,21 @@ public class GMLToDBProcessor implements Processor {
     private Timestamp getTimestampFromFeatureString(String strTime) {
     	Timestamp ts = null;
     	java.util.Date date = null;
-    	SimpleDateFormat sdf = null;
     	
-    	// Expected format... but should be forgiving if this doesn't work
-    	
-		try {
-			log.debug("Using this dateFormatPattern: " + dateFormatPattern);
-			sdf = new SimpleDateFormat(dateFormatPattern, Locale.US); // TODO:NEW make locale configurable
-			date = sdf.parse(strTime);
-			ts = new Timestamp(date.getTime());
-		} catch (ParseException e) {
-			log.error("Exception parsing incoming timestamp("+strTime+"): " + e.getMessage());			
-		}
+    	for(String format: dateFormats) {
+        	SimpleDateFormat sdf = null;
+        	
+        	// Expected format... but should be forgiving if this doesn't work
+        	
+    		try {
+    			log.debug("Using this dateFormatPattern: " + dateFormatPattern);
+    			sdf = new SimpleDateFormat(format, Locale.US); // TODO:NEW make locale configurable
+    			date = sdf.parse(strTime);
+    			ts = new Timestamp(date.getTime());
+    		} catch (ParseException e) {
+    			log.error("Exception parsing incoming timestamp("+strTime+"): " + e.getMessage());			
+    		}
+    	}
     	
 		// If above method didn't work, then try deprecated method below
 		if(ts == null) {

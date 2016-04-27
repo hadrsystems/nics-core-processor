@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="UTF-8"?><wfs:FeatureCollection xsi:schemaLocation="http://internal-geoserver-stg-1433186686.us-west-2.elb.amazonaws.com/scout http://internal-geoserver-stg-1433186686.us-west-2.elb.amazonaws.com/geoserver/scout/wfs?service=WFS&amp;version=1.0.0&amp;request=DescribeFeatureType&amp;typeName=scout%3Aavlxriground http://www.opengis.net/wfs http://internal-geoserver-stg-1433186686.us-west-2.elb.amazonaws.com/geoserver/schemas/wfs/1.0.0/WFS-basic.xsd" xmlns:scout="http://internal-geoserver-stg-1433186686.us-west-2.elb.amazonaws.com/scout" xmlns:wfs="http://www.opengis.net/wfs" xmlns:gml="http://www.opengis.net/gml" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 <!--
 
     Copyright (c) 2008-2016, Massachusetts Institute of Technology (MIT)
@@ -30,19 +29,36 @@
     OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 -->
-<gml:featureMember>
-<scout:avlxriground>
-<scout:id>info:us.ca.calfire/rru:SQ76</scout:id>
-<scout:name>SQ76</scout:name>
-<scout:description>&lt;br&gt;&lt;b&gt;Vehicle&lt;/b&gt;: SQ76&lt;br&gt;&lt;b&gt;Group&lt;/b&gt;: RVCFire&lt;br&gt;&lt;b&gt;SubGroup&lt;/b&gt;: Medic Squad&lt;br&gt;&lt;b&gt;Course&lt;/b&gt;: 125&lt;br&gt;&lt;b&gt;Updated&lt;/b&gt;: 2016-03-30T18:59:59Z&lt;br&gt;</scout:description>
-<scout:geom>
-<gml:Point srsName="EPSG:4326">
-<gml:coordinates>33.686582,-117.152935,0</gml:coordinates>
-</gml:Point>
-</scout:geom>
-<scout:speed>0</scout:speed>
-<scout:course>125</scout:course>
-<scout:timestamp>2016-03-30T18:59:59Z</scout:timestamp>
-</scout:avlxriground>
-</gml:featureMember>
-</wfs:FeatureCollection>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd">
+
+	<bean id="log4jInitialization" class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+		<property name="targetClass" value="org.springframework.util.Log4jConfigurer" />
+		<property name="targetMethod" value="initLogging" />
+		<property name="arguments">
+			<list>											
+				<value>config/log4j-gst2gml.properties</value>
+			</list>
+		</property>
+	</bean>	
+
+	<camelContext id="camel" xmlns="http://camel.apache.org/schema/spring">
+		
+		<propertyPlaceholder id="props" location="file:config/gst2gml.properties" />				
+
+		<route id="ProcessAircraftRoute" >
+			<from uri="{{rabbitAircraft}}" />
+			<to uri="{{airTransform}}" /> 
+			<to uri="{{geodatafeed}}" />
+			<!--<to uri="stream:out" />-->
+		</route>
+		
+		<route id="ProcessGroundRoute" >
+			<from uri="{{rabbitGround}}" />
+			<to uri="{{groundTransform}}" /> 
+			<to uri="{{geodatafeed}}" />
+			<!--<to uri="stream:out" />-->
+		</route>
+
+	</camelContext>
+
+</beans>
