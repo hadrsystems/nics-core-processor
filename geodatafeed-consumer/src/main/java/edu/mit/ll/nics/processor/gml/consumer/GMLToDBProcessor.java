@@ -372,10 +372,6 @@ public class GMLToDBProcessor implements Processor {
     @Override
     //@SuppressWarnings({"unchecked", "unchecked", "unchecked", "unchecked"})
     public void process(Exchange exchange) {
-<<<<<<< ed9ec07b76e8062cc539026ded1f1d8c7ec472a0
-    	System.out.println("************************************processing");
-=======
->>>>>>> V6.2 merge
     	if(!hasInitialized && !init()) {
 			log.info("Initialization failed... shutting down.");
 			try {
