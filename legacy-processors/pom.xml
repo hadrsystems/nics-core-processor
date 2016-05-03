@@ -43,7 +43,11 @@
 	<parent>
 		<groupId>edu.mit.ll.nics.processor</groupId>
 		<artifactId>master-pom</artifactId>
+<<<<<<< ed9ec07b76e8062cc539026ded1f1d8c7ec472a0
 		<version>6.1.2</version>
+=======
+		<version>6.1.1</version>
+>>>>>>> V6.2 merge
 		<relativePath>..</relativePath>
 	</parent>
 

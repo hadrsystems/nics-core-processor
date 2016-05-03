@@ -34,7 +34,9 @@ import java.io.InputStream;
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.regex.Pattern;
@@ -130,7 +132,6 @@ public class GMLToDBProcessor implements Processor {
 	private String dateFormatPatternOp1 = "yyyy-MM-dd'T'HH:mm:ssX";
 	private String dateFormatPatternOp2 = "yyyy-MM-dd'T'HH:mm:ssXX";
 	private String dateFormatPatternOp3 = "yyyy-MM-dd'T'HH:mm:ssXXX";
-	
 	
     private String log4jPropertyFile;
 	
@@ -371,7 +372,10 @@ public class GMLToDBProcessor implements Processor {
     @Override
     //@SuppressWarnings({"unchecked", "unchecked", "unchecked", "unchecked"})
     public void process(Exchange exchange) {
+<<<<<<< ed9ec07b76e8062cc539026ded1f1d8c7ec472a0
     	System.out.println("************************************processing");
+=======
+>>>>>>> V6.2 merge
     	if(!hasInitialized && !init()) {
 			log.info("Initialization failed... shutting down.");
 			try {
