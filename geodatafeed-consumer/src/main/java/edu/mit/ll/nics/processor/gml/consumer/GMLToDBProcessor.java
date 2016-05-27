@@ -34,9 +34,7 @@ import java.io.InputStream;
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.regex.Pattern;
@@ -461,7 +459,6 @@ public class GMLToDBProcessor implements Processor {
         	if (tsNew.after(new Timestamp(currentTimeMillis + new_feature_threshold))) { //if it's "newer" than threshold
         		throw new GdfcException("Timestamp is too far in the future and being ignored");
         	}
-        	
         	
         	//ERROR CHECK - COORDINATES
         	Point point =  (Point) feat.getDefaultGeometry();
