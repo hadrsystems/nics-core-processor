@@ -19,3 +19,4 @@ release.properties
 # intellij
 .idea/
 *.iml
+geodatafeed-consumer/config
