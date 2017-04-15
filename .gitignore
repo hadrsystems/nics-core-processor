@@ -20,3 +20,4 @@ release.properties
 .idea/
 *.iml
 geodatafeed-consumer/config
+json-pli-consumer/config
