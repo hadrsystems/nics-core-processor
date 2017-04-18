@@ -151,7 +151,7 @@
 		<!-- MITLL dependencies -->
 		<!-- NICS internal module dependencies -->
 		<dependency>
-			<groupId>edu.mit.ll.nics.common</groupId>
+			<groupId>com.tabordasolutions.nics.common</groupId>
 			<artifactId>xml-email</artifactId>
 		</dependency>
 	</dependencies>
