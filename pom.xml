@@ -65,6 +65,7 @@
 		These are used to specify things like dependency and plugin versions, configuration 
 		values that should be quickly configurable, etc. -->
 	<properties>
+		<nics-commonlib.version>2017.1</nics-commonlib.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<!-- External dependency versions -->
 		<camel.version>2.15.5</camel.version> <!-- 2.14.3 -->
@@ -522,49 +523,49 @@
 				${project.version} so that they always reflect the version of the component/library 
 				that goes along with this version of NICS. -->
 			<dependency>
-				<groupId>edu.mit.ll.nics.common</groupId>
+				<groupId>com.tabordasolutions.nics.common</groupId>
 				<artifactId>dao-lib</artifactId>
-				<version>${project.version}</version>
+				<version>${nics-commonlib.version}</version>
 			</dependency>
 			<dependency>
-				<groupId>edu.mit.ll.nics.common</groupId>
+				<groupId>com.tabordasolutions.nics.common</groupId>
 				<artifactId>email-alert</artifactId>
-				<version>${project.version}</version>
+				<version>${nics-commonlib.version}</version>
 			</dependency>
 			<dependency>
-				<groupId>edu.mit.ll.nics.common</groupId>
+				<groupId>com.tabordasolutions.nics.common</groupId>
 				<artifactId>encryption-lib</artifactId>
-				<version>${project.version}</version>
+				<version>${nics-commonlib.version}</version>
 			</dependency>
 			<dependency>
-				<groupId>edu.mit.ll.nics.common</groupId>
+				<groupId>com.tabordasolutions.nics.common</groupId>
 				<artifactId>entities</artifactId>
-				<version>${project.version}</version>
+				<version>${nics-commonlib.version}</version>
 			</dependency>
 			<dependency>
-				<groupId>edu.mit.ll.nics.common</groupId>
+				<groupId>com.tabordasolutions.nics.common</groupId>
 				<artifactId>geoserver-rest-api</artifactId>
-				<version>${project.version}</version>
+				<version>${nics-commonlib.version}</version>
 			</dependency>
 			<dependency>
-				<groupId>edu.mit.ll.nics.common</groupId>
+				<groupId>com.tabordasolutions.nics.common</groupId>
 				<artifactId>messages</artifactId>
-				<version>${project.version}</version>
+				<version>${nics-commonlib.version}</version>
 			</dependency>
 			<dependency>
-				<groupId>edu.mit.ll.nics.common</groupId>
+				<groupId>com.tabordasolutions.nics.common</groupId>
 				<artifactId>message-parser</artifactId>
-				<version>${project.version}</version>
+				<version>${nics-commonlib.version}</version>
 			</dependency>
 			<dependency>
-				<groupId>edu.mit.ll.nics.common</groupId>
+				<groupId>com.tabordasolutions.nics.common</groupId>
 				<artifactId>rabbitmq-admin-interface</artifactId>
-				<version>${project.version}</version>
+				<version>${nics-commonlib.version}</version>
 			</dependency>
 			<dependency>
-				<groupId>edu.mit.ll.nics.common</groupId>
+				<groupId>com.tabordasolutions.nics.common</groupId>
 				<artifactId>rabbitmq-client</artifactId>
-				<version>${project.version}</version>
+				<version>${nics-commonlib.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>org.springframework</groupId>
@@ -578,14 +579,14 @@
 				<scope>test</scope>
 			</dependency>
 			<dependency>
-				<groupId>edu.mit.ll.nics.common</groupId>
+				<groupId>com.tabordasolutions.nics.common</groupId>
 				<artifactId>web-service-request-lib</artifactId>
-				<version>${project.version}</version>
+				<version>${nics-commonlib.version}</version>
 			</dependency>
 			<dependency>
-				<groupId>edu.mit.ll.nics.common</groupId>
+				<groupId>com.tabordasolutions.nics.common</groupId>
 				<artifactId>xml-email</artifactId>
-				<version>${project.version}</version>
+				<version>${nics-commonlib.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>net.sourceforge.htmlunit</groupId>
