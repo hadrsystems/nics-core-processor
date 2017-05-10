@@ -44,7 +44,7 @@ public class RAWSFeatureFactoryTest {
     public void testBuildFeature() throws Exception {
         RAWSFeatureGeometry RAWSFeatureGeometry = new RAWSFeatureGeometry("Point", Arrays.asList(-121.0, 36.0));
         RAWSObservations RAWSObservations = new RAWSObservations("ACTIVE", "POSITIVE", "POSITIVE VIBES", "CA",
-                62,10,2,4,238,10,new Timestamp(new Date().getTime()),"http://test-station.com/more-observations/POSITIVE");
+                62.0,10.0,2.0,4.0,238.0,10.0,new Timestamp(new Date().getTime()),"http://test-station.com/more-observations/POSITIVE");
         RAWSFeature sourceRAWSFeature = new RAWSFeature(RAWSFeatureGeometry, "Feature", RAWSObservations);
         Coordinate pointCoordinates = new Coordinate(RAWSFeatureGeometry.getCoordinates().get(0), RAWSFeatureGeometry.getCoordinates().get(1));
         Point point1 = jtsGeometryFactory.createPoint(pointCoordinates);

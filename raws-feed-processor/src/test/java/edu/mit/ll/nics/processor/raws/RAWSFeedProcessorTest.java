@@ -94,7 +94,7 @@ public class RAWSFeedProcessorTest {
     public void testWhenResponseHasValidFeaturesAndFeatureSourceIsWritable() throws Exception {
         RAWSFeatureGeometry rawsFeatureGeometry1 = new RAWSFeatureGeometry("Point", Arrays.asList(-121.0, 36.0));
         RAWSObservations rawsObservations1 = new RAWSObservations("ACTIVE", "POSITIVE", "POSITIVE VIBES", "CA",
-                62,10,2,4,238,10,new Timestamp(new Date().getTime()),"http://test-station.com/more-observations/POSITIVE");
+                62.0,10.0,2.0,4.0,238.0,10.0,new Timestamp(new Date().getTime()),"http://test-station.com/more-observations/POSITIVE");
         RAWSFeature rawsFeature1 = new RAWSFeature(rawsFeatureGeometry1, "Feature", rawsObservations1);
 
 //        RAWSFeatureGeometry rawsFeatureGeometry2 = new RAWSFeatureGeometry("Point", Arrays.asList(-100.0, 12.0));
