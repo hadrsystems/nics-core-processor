@@ -59,7 +59,8 @@
 		<module>spring-runner</module>
 		<module>email-consumer</module>
 		<module>component-manager-archive-builder</module>
-	</modules>
+        <module>raws-feed-processor</module>
+    </modules>
 
 	<!-- Properties for use in the master NICS pom and the poms of any submodules. 
 		These are used to specify things like dependency and plugin versions, configuration 
@@ -100,6 +101,7 @@
 		<jsdoc.version>1.4.1</jsdoc.version>
 		<jslint.version>2007-10-25</jslint.version>
 		<json.version>20090211</json.version>
+        <jackson.json.version>2.8.3</jackson.json.version>
 		<jstd.version>1.3.2</jstd.version>
 		<jts.version>1.11</jts.version>
 		<jsunit.version>2.1.4</jsunit.version>
@@ -117,6 +119,7 @@
 		<spring.version>3.1.2.RELEASE</spring.version>
 		<surefire-junit.version>2.4.3</surefire-junit.version>
 		<testng.version>6.8</testng.version>
+        <mockito.version>1.9.5</mockito.version>
 		<xalan.version>2.7.1</xalan.version>
 		<xerces.version>2.9.1</xerces.version>
 		<xml-apis.version>1.4.01</xml-apis.version>
@@ -394,6 +397,11 @@
 				<artifactId>gt-wfs</artifactId>
 				<version>${geotools.version}</version>
 			</dependency>
+            <dependency>
+                <groupId>org.geotools</groupId>
+                <artifactId>gt-geometry</artifactId>
+                <version>${geotools.version}</version>
+            </dependency>
 			<dependency>
 				<groupId>org.hibernate</groupId>
 				<artifactId>hibernate-c3p0</artifactId>
@@ -445,7 +453,22 @@
 				<artifactId>json</artifactId>
 				<version>${json.version}</version>
 			</dependency>
-			<dependency>
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-core</artifactId>
+                <version>${jackson.json.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-databind</artifactId>
+                <version>${jackson.json.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-annotations</artifactId>
+                <version>${jackson.json.version}</version>
+            </dependency>
+            <dependency>
 				<groupId>org.postgis</groupId>
 				<artifactId>postgis-jdbc</artifactId>
 				<version>${postgis-jdbc.version}</version>
@@ -496,6 +519,12 @@
 				<version>${testng.version}</version>
 				<scope>test</scope>
 			</dependency>
+            <dependency>
+                <groupId>org.mockito</groupId>
+                <artifactId>mockito-core</artifactId>
+                <version>${mockito.version}</version>
+                <scope>test</scope>
+            </dependency>
 			<dependency>
 				<groupId>postgresql</groupId>
 				<artifactId>postgresql</artifactId>
