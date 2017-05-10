@@ -51,9 +51,15 @@
 
     <camelContext id="camel" xmlns="http://camel.apache.org/schema/spring">
         <propertyPlaceholder id="props" location="file:config/raws-feed-processor.properties" />
-        <route id="rawsScheduler">
-            <from uri="timer://ping?fixedRate=true&amp;period=5m" />
-            <to uri="{{raws.mesowest.api.latest.in.last.five.min}}"/>
+        <route id="rawsRequestAllStationsLatest">
+            <from uri="timer://ping?repeatCount=1"/>
+            <to uri="{{raws.mesowest.api.latest.all}}"/>
+            <process ref="rawsFeedProcessor"/>
+        </route>
+
+        <route id="rawsRequestLatestFromLastRun">
+            <from uri="timer://ping?fixedRate=true&amp;period={{raws.mesowest.processor.run.frequency}}&amp;delay={{raws.mesowest.processor.run.frequency}}" />
+            <to uri="{{raws.mesowest.api.latest.in.last.x.min}}"/>
             <process ref="rawsFeedProcessor"/>
         </route>
     </camelContext>

@@ -3,8 +3,10 @@ package edu.mit.ll.nics.processor.raws.model;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import edu.mit.ll.nics.processor.util.CompassDirectionConverter;
 
 import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -32,6 +34,9 @@ public class RAWSObservations {
     private Date lastObservationAt;
     @JsonProperty("more_observations")
     private String moreObservationsUrl;
+
+    private static final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm z");
+    private static CompassDirectionConverter compassDirectionConverter = new CompassDirectionConverter();
 
     public RAWSObservations() {}
 
@@ -100,6 +105,20 @@ public class RAWSObservations {
     }
 
     public String getDescription() {
-        return "";
+        StringBuilder description = new StringBuilder();
+        String compassDirection = this.getWindDirection() == null ? "" : compassDirectionConverter.getCompassDirection(this.getWindDirection());
+        String windSpeed = (this.getWindSpeed() == null) ? "N/A" : this.getWindSpeed().toString();
+        String windGust = (this.getWindGust() == null) ? "N/A" : this.getWindGust().toString();
+        String airTemperature = (this.getAirTemperature() == null) ? "N/A" : this.getAirTemperature().toString();
+        String dewPoint = (this.getDewPointTemperature() == null) ? "N/A" : this.getDewPointTemperature().toString();
+        String humidity = (this.getRelativeHumidity() == null) ? "N/A" : this.getRelativeHumidity().toString();
+        description.append(String.format("<br><b>%s</b> %s %s<br>", this.getStationName(), this.getStationId(), this.getStatus()));
+        description.append(String.format("<b>%s</b><br>", simpleDateFormat.format(this.getLastObservationAt())));
+        description.append(String.format("<b>Wind:                  %s %s MPH</b><br>", compassDirection, windSpeed));
+        description.append(String.format("<b>Wind Gust:                  %s MPH</b><br>", windGust));
+        description.append(String.format("<b>Temperature:           %s &#8457;</b><br>", airTemperature));
+        description.append(String.format("<b>Dew Point:             %s &#8457;</b><br>", dewPoint));
+        description.append(String.format("<b>Humidity:              %s &#37; </b><br>", humidity));
+        return description.toString();
     }
 }

@@ -1,5 +1,6 @@
 package edu.mit.ll.nics.processor.raws;
 
+import com.google.common.base.Stopwatch;
 import edu.mit.ll.nics.processor.DataStoreManager;
 import edu.mit.ll.nics.processor.factory.RAWSFeatureFactory;
 import edu.mit.ll.nics.processor.raws.model.RAWSFeature;
@@ -21,9 +22,8 @@ import org.opengis.filter.Filter;
 import org.opengis.referencing.FactoryException;
 
 import java.io.IOException;
-import java.sql.Timestamp;
-import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 public class RAWSFeedProcessor implements Processor {
 
@@ -58,6 +58,7 @@ public class RAWSFeedProcessor implements Processor {
     }
 
     private void persistFeatures(List<RAWSFeature> rawsFeatures) {
+        Stopwatch stopwatch = Stopwatch.createStarted();
         if(rawsFeatures.size() == 0) {
             logger.info("Zero RAWS features to process, exiting current process");
             return;
@@ -89,21 +90,13 @@ public class RAWSFeedProcessor implements Processor {
             SimpleFeatureCollection newFeatureCollection = new ListFeatureCollection(rawsFeatureType, newFeatures);
             featureStore.addFeatures(newFeatureCollection);
             transaction.commit();
-            logger.info(String.format("Successfully completed processing %d RAWS Features", rawsFeatures.size()));
+            logger.info(String.format("Successfully completed processing %d RAWS Features in %d ms", rawsFeatures.size(), stopwatch.elapsed(TimeUnit.MILLISECONDS)));
         } catch(Exception e) {
-            logger.error("Error processing RAWS features", e);
+            logger.error(String.format("Failed to process RAWS features successfully, ran for %d ms before failing", stopwatch.elapsed(TimeUnit.MILLISECONDS)), e);
             return;
         } finally {
             if(transaction != null)
                 transaction.close();
         }
-    }
-
-    private static Timestamp decodeObservation(String lastObservationStr)  throws Exception {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
-        Date parsedDate = sdf.parse(lastObservationStr);
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(parsedDate);
-        return new Timestamp(calendar.getTimeInMillis());
     }
 }
