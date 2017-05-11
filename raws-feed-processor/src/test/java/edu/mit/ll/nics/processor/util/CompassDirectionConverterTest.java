@@ -5,7 +5,7 @@ import org.testng.annotations.Test;
 
 public class CompassDirectionConverterTest {
 
-    private CompassDirectionConverter converter = new CompassDirectionConverter();
+    private final CompassDirectionConverter converter = new CompassDirectionConverter();
 
     @Test
     public void testReturnsNorthForNorthDirectionInDegrees() {

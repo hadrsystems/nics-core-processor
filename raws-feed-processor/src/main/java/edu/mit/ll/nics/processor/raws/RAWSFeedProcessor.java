@@ -34,7 +34,7 @@ public class RAWSFeedProcessor implements Processor {
     private RAWSFeatureFactory rawsFeatureFactory;
 
     public RAWSFeedProcessor(DataStoreManager dataStoreManager, String rawsFeatureSource, RAWSResponseParser rawsResponseParser,
-                             RAWSFeatureFactory rawsFeatureFactory) throws IOException, FactoryException {
+                             RAWSFeatureFactory rawsFeatureFactory) {
         this.dataStoreManager = dataStoreManager;
         this.rawsFeatureSource= rawsFeatureSource;
         this.rawsResponseParser = rawsResponseParser;
@@ -95,7 +95,6 @@ public class RAWSFeedProcessor implements Processor {
             logger.info(String.format("Successfully completed processing %d RAWS Features in %d ms", rawsFeatures.size(), stopwatch.elapsed(TimeUnit.MILLISECONDS)));
         } catch(Exception e) {
             logger.error(String.format("Failed to process RAWS features successfully, ran for %d ms before failing", stopwatch.elapsed(TimeUnit.MILLISECONDS)), e);
-            return;
         } finally {
             if(transaction != null)
                 transaction.close();

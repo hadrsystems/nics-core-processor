@@ -14,17 +14,17 @@ public class DataStoreManager {
 
     private static final Logger logger = Logger.getLogger(DataStoreManager.class.getSimpleName());
 
-    private String dbType;
-    private String dbHost;
-    private String dbPort;
-    private String dbName;
-    private String dbUser;
-    private String dbPassword;
+    private final String dbType;
+    private final String dbHost;
+    private final String dbPort;
+    private final String dbName;
+    private final String dbUser;
+    private final String dbPassword;
     private DataStore dataStore;
-    private int dataStoreExpiryTimeInSeconds;
-    private Stopwatch stopWatch;
+    private final int dataStoreExpiryTimeInSeconds;
+    private final Stopwatch stopWatch;
 
-    public DataStoreManager(String dbType, String dbHost, String dbPort, String dbName, String dbUser, String dbPassword, int dataStoreExpiryTimeInSeconds, Stopwatch stopWatch) throws IOException {
+    public DataStoreManager(String dbType, String dbHost, String dbPort, String dbName, String dbUser, String dbPassword, int dataStoreExpiryTimeInSeconds, Stopwatch stopWatch) {
         this.dbType = dbType;
         this.dbHost = dbHost;
         this.dbPort = dbPort;
@@ -35,7 +35,7 @@ public class DataStoreManager {
         this.stopWatch = stopWatch;
     }
 
-    public DataStoreManager(String dbType, String dbHost, String dbPort, String dbName, String dbUser, String dbPassword, int dataStoreExpiryTimeInSeconds) throws IOException {
+    public DataStoreManager(String dbType, String dbHost, String dbPort, String dbName, String dbUser, String dbPassword, int dataStoreExpiryTimeInSeconds) {
         this.dbType = dbType;
         this.dbHost = dbHost;
         this.dbPort = dbPort;

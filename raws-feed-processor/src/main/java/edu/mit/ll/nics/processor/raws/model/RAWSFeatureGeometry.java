@@ -8,7 +8,7 @@ import java.util.List;
 public class RAWSFeatureGeometry {
 
     private String type;
-    private List<Double> coordinates = new ArrayList<Double>();
+    private final List<Double> coordinates = new ArrayList<Double>();
 
     public RAWSFeatureGeometry() {}
 

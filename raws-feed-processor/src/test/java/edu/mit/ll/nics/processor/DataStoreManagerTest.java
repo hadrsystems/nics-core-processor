@@ -12,14 +12,14 @@ import java.util.concurrent.TimeUnit;
 
 
 public class DataStoreManagerTest {
-    private String dbType ="postgis";
-    private String dbHost ="testhost";
-    private String dbPort = "1001";
-    private String dbName = "raws";
-    private String dbUser ="user";
-    private String dbPassword = "pwd";
-    private int dataStoreExpiryTimeInSeconds = 3;
-    private Stopwatch stopWatch = Stopwatch.createUnstarted();
+    private final String dbType ="postgis";
+    private final String dbHost ="testhost";
+    private final String dbPort = "1001";
+    private final String dbName = "raws";
+    private final String dbUser ="user";
+    private final String dbPassword = "pwd";
+    private final int dataStoreExpiryTimeInSeconds = 3;
+    private final Stopwatch stopWatch = Stopwatch.createUnstarted();
     private DataStoreManager dataStoreManager;
 
     @BeforeTest

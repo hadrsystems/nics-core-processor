@@ -33,24 +33,24 @@ import static org.mockito.Mockito.eq;
 public class RAWSFeedProcessorTest {
 
     private DataStoreManager dataStoreManager;
-    private String rawsFeatureSource = "raws";
-    private RAWSResponseParser rawsResponseParser = mock(RAWSResponseParser.class);
-    private RAWSFeatureFactory rawsFeatureFactory = mock(RAWSFeatureFactory.class);
+    private final String rawsFeatureSource = "raws";
+    private final RAWSResponseParser rawsResponseParser = mock(RAWSResponseParser.class);
+    private final RAWSFeatureFactory rawsFeatureFactory = mock(RAWSFeatureFactory.class);
 
-    private DataStore dataStore = mock(DataStore.class);
-    private SimpleFeatureSource featureSourceReadOnly = mock(SimpleFeatureSource.class);
-    private SimpleFeatureStore featureStore = mock(SimpleFeatureStore.class);
-    private SimpleFeatureType rawsFeatureType = mock(SimpleFeatureType.class);
-    private SimpleFeatureBuilder simpleFeatureBuilder = mock(SimpleFeatureBuilder.class);
-    private SimpleFeature simpleFeature1 = mock(SimpleFeature.class);
+    private final DataStore dataStore = mock(DataStore.class);
+    private final SimpleFeatureSource featureSourceReadOnly = mock(SimpleFeatureSource.class);
+    private final SimpleFeatureStore featureStore = mock(SimpleFeatureStore.class);
+    private final SimpleFeatureType rawsFeatureType = mock(SimpleFeatureType.class);
+    private final SimpleFeatureBuilder simpleFeatureBuilder = mock(SimpleFeatureBuilder.class);
+    private final SimpleFeature simpleFeature1 = mock(SimpleFeature.class);
 
     private RAWSFeedProcessor rawsFeedProcessor;
-    private Exchange exchange = mock(Exchange.class);
-    private Message message = mock(Message.class);
-    private String testGeoJson = "Test Geo Json";
+    private final Exchange exchange = mock(Exchange.class);
+    private final Message message = mock(Message.class);
+    private final String testGeoJson = "Test Geo Json";
 
     private RAWSResponse response = mock(RAWSResponse.class);
-    private RAWSSummary summary = mock(RAWSSummary.class);
+    private final RAWSSummary summary = mock(RAWSSummary.class);
 
     @BeforeMethod
     public void setup() throws Exception {

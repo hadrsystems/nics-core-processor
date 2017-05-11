@@ -7,7 +7,7 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 
 public class CRSFactoryTest {
-    private CRSFactory crsFactory = new CRSFactory();
+    private final CRSFactory crsFactory = new CRSFactory();
 
     @Test
     public void testReturnsValidWGS84() throws FactoryException {

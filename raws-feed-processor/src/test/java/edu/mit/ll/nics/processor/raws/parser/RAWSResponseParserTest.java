@@ -10,7 +10,7 @@ import java.util.Date;
 
 public class RAWSResponseParserTest {
 
-    private RAWSResponseParser parser = new RAWSResponseParser();
+    private final RAWSResponseParser parser = new RAWSResponseParser();
 
     @Test
     public void rawsResponseWithSummaryParsedSuccessfully() throws IOException {

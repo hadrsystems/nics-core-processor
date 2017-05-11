@@ -21,21 +21,21 @@ import java.util.Date;
 import static org.mockito.Mockito.*;
 
 public class RAWSFeatureFactoryTest {
-    private CRSFactory crsFactory = new CRSFactory();
-    private GeometryFactory geometryFactory = mock(GeometryFactory.class);
-    private GeometryFactory jtsGeometryFactory = JTSFactoryFinder.getGeometryFactory();
-    private String rawsSourceCRS = "WGS84";
-    private String rawsTargetCRS = "EPSG:3857";
-    private SimpleFeatureBuilder featureBuilder = mock(SimpleFeatureBuilder.class);
-    private SimpleFeature simpleFeature = mock(SimpleFeature.class);
-    private Clock clock = mock(Clock.class);
-    private Date currentDate = new Date();
+    private final CRSFactory crsFactory = new CRSFactory();
+    private final GeometryFactory geometryFactory = mock(GeometryFactory.class);
+    private final GeometryFactory jtsGeometryFactory = JTSFactoryFinder.getGeometryFactory();
+    private final SimpleFeatureBuilder featureBuilder = mock(SimpleFeatureBuilder.class);
+    private final SimpleFeature simpleFeature = mock(SimpleFeature.class);
+    private final Clock clock = mock(Clock.class);
+    private final Date currentDate = new Date();
     private Timestamp currentTimestamp = new Timestamp(currentDate.getTime());
 
-    RAWSFeatureFactory rawsFeatureFactory;
+    private RAWSFeatureFactory rawsFeatureFactory;
 
     @BeforeTest
     public void setup() throws Exception {
+        String rawsSourceCRS = "WGS84";
+        String rawsTargetCRS = "EPSG:3857";
         this.rawsFeatureFactory = new RAWSFeatureFactory(geometryFactory, clock, crsFactory, rawsSourceCRS, rawsTargetCRS);
         when(clock.getCurrentDate()).thenReturn(currentDate);
     }

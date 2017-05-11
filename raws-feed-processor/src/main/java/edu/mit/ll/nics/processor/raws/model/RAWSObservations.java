@@ -38,7 +38,7 @@ public class RAWSObservations {
 
     private static final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm z");
     private static final SimpleDateFormat timeFormatInUTC = new SimpleDateFormat("HH:mm z");
-    private static CompassDirectionConverter compassDirectionConverter = new CompassDirectionConverter();
+    private static final CompassDirectionConverter compassDirectionConverter = new CompassDirectionConverter();
 
     static{
         timeFormatInUTC.setTimeZone(TimeZone.getTimeZone("UTC"));

@@ -19,10 +19,10 @@ import java.sql.Timestamp;
 
 public class RAWSFeatureFactory {
 
-    private GeometryFactory geometryFactory;
-    private CoordinateReferenceSystem sourceCRS;
-    private CoordinateReferenceSystem targetCRS;
-    private Clock clock;
+    private final GeometryFactory geometryFactory;
+    private final CoordinateReferenceSystem sourceCRS;
+    private final CoordinateReferenceSystem targetCRS;
+    private final Clock clock;
 
     public RAWSFeatureFactory(GeometryFactory geometryFactory, Clock clock, CRSFactory crsFactory, String rawsSourceCRSString, String rawsTargetCRSString) throws FactoryException {
         this.geometryFactory = geometryFactory;
@@ -35,13 +35,12 @@ public class RAWSFeatureFactory {
         RAWSObservations rawsObservations = sourceRAWSFeature.getRawsObservations();
         Timestamp currentTimestamp = getCurrentTimestamp();
         Point point = createGeom(sourceRAWSFeature.getRawsFeatureGeometry());
-        SimpleFeature simpleFeature = featureBuilder.buildFeature("1", new Object[]{
+        return featureBuilder.buildFeature("1", new Object[]{
                 rawsObservations.getStationId(), rawsObservations.getStationName(), rawsObservations.getStatus(), rawsObservations.getState(),
                 rawsObservations.getAirTemperature(), rawsObservations.getWindSpeed(), rawsObservations.getWindDirection(),
                 rawsObservations.getWindGust(), rawsObservations.getDewPointTemperature(), rawsObservations.getRelativeHumidity(),
                 rawsObservations.getMoreObservationsUrl(), rawsObservations.getDescription(), new Timestamp(rawsObservations.getLastObservationAt().getTime()), currentTimestamp, point
         });
-        return simpleFeature;
     }
 
     private com.vividsolutions.jts.geom.Point createGeom(RAWSFeatureGeometry RAWSFeatureGeometry) throws Exception {
