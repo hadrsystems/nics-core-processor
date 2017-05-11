@@ -10,7 +10,7 @@ public class CompassDirectionConverter {
 
     public String getCompassDirection(double directionInDegrees) {
         double normalizedDirectionInDegrees = directionInDegrees % TOTAL_DEGREES;
-        double compassDirectionIndex = normalizedDirectionInDegrees/DEGREES_PER_COMPASS_DIRECTION;
+        long compassDirectionIndex = Math.round(normalizedDirectionInDegrees/DEGREES_PER_COMPASS_DIRECTION);
         return COMPASS_DIRECTIONS[(int) compassDirectionIndex];
     }
 }

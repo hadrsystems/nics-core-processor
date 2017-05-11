@@ -11,20 +11,40 @@ public class CompassDirectionConverterTest {
     public void testReturnsNorthForNorthDirectionInDegrees() {
         double directionInDegrees = 0;
         Assert.assertEquals(converter.getCompassDirection(directionInDegrees), "N");
-        Assert.assertEquals(converter.getCompassDirection(20), "N");
+        Assert.assertEquals(converter.getCompassDirection(20), "NNE");
     }
 
     @Test
-    public void testReturnsNNE() {
+    public void verifyDirectionDegreesForNorth() {
+        Assert.assertEquals(converter.getCompassDirection(0), "N");
+        Assert.assertEquals(converter.getCompassDirection(10), "N");
+        Assert.assertEquals(converter.getCompassDirection(360), "N");
+    }
+
+    @Test
+    public void verifyDirectionDegreesForNNE() {
+        Assert.assertEquals(converter.getCompassDirection(12.25), "NNE");
+        Assert.assertEquals(converter.getCompassDirection(12.26), "NNE");
+        Assert.assertEquals(converter.getCompassDirection(20), "NNE");
         Assert.assertEquals(converter.getCompassDirection(22.5), "NNE");
-        Assert.assertEquals(converter.getCompassDirection(42.5), "NNE");
-        Assert.assertEquals(converter.getCompassDirection(44.8), "NNE");
+    }
+
+    @Test
+    public void verifyDirectionDegreesForNE() {
+        Assert.assertEquals(converter.getCompassDirection(34.75), "NE");
+        Assert.assertEquals(converter.getCompassDirection(42.5), "NE");
+        Assert.assertEquals(converter.getCompassDirection(44.8), "NE");
+    }
+
+    @Test
+    public void verifyCompassDirectionForSSW() {
+        Assert.assertEquals(converter.getCompassDirection(202.0), "SSW");
     }
 
     @Test
     public void testDegreesAreNormalizedBeforeCalculatingCompassDirection() {
         Assert.assertEquals(converter.getCompassDirection(360+360), "N");
         Assert.assertEquals(converter.getCompassDirection(360+250), "WSW");
-        Assert.assertEquals(converter.getCompassDirection(360+170), "SSE");
+        Assert.assertEquals(converter.getCompassDirection(360+170), "S");
     }
 }

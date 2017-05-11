@@ -86,6 +86,8 @@ public class RAWSFeedProcessor implements Processor {
                 newFeatures.add(simpleFeature);
                 Filter filter = CQL.toFilter("station_id = '" + RAWSFeature.getRawsObservations().getStationId() + "'");
                 featureStore.removeFeatures(filter);
+                if(newFeatures.size()%100 == 0)
+                    logger.debug(String.format("So far processed %d features", newFeatures.size()));
             }
             SimpleFeatureCollection newFeatureCollection = new ListFeatureCollection(rawsFeatureType, newFeatures);
             featureStore.addFeatures(newFeatureCollection);
