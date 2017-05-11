@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 #
 # Copyright (c) 2008-2016, Massachusetts Institute of Technology (MIT)
 # All rights reserved.
@@ -30,11 +31,5 @@
 
 NAME=${NAME:-"geodatafeed-consumer"}
 LIBDIR=${LIBDIR:-"./lib"}
-
-echo "--------invoking camel spring app: ${NAME} on $(date)"
-echo " $(pwd)"
-echo "........spring config file ............................"
-cat config/spring/${NAME}.xml
-echo "-----------------------------------------------------------------"
 
 java -DappName=${NAME} -Xmx512M -server -cp "$LIBDIR/*" org.apache.camel.spring.Main -fa config/spring/${NAME}.xml
