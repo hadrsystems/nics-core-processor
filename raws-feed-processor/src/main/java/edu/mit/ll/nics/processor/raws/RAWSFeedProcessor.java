@@ -19,7 +19,6 @@ import org.geotools.filter.text.cql2.CQL;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.filter.Filter;
-import org.opengis.referencing.FactoryException;
 
 import java.io.IOException;
 import java.util.*;
@@ -57,7 +56,7 @@ public class RAWSFeedProcessor implements Processor {
         this.persistFeatures(response.getRAWSFeatures());
     }
 
-    private void persistFeatures(List<RAWSFeature> rawsFeatures) {
+    private void persistFeatures(List<RAWSFeature> rawsFeatures) throws Exception {
         Stopwatch stopwatch = Stopwatch.createStarted();
         if(rawsFeatures.size() == 0) {
             logger.info("Zero RAWS features to process, exiting current process");
@@ -65,6 +64,7 @@ public class RAWSFeedProcessor implements Processor {
         }
         logger.debug(String.format("Processing %d RAWS features", rawsFeatures.size()));
         DefaultTransaction transaction = null;
+        int successfulFeatureUpdates = 0, failedFeatureUpdates = 0;
 
         try {
             DataStore datastore = dataStoreManager.getInstance();
@@ -79,25 +79,42 @@ public class RAWSFeedProcessor implements Processor {
             featureStore.setTransaction(transaction);
             SimpleFeatureType rawsFeatureType = featureStore.getSchema();
             SimpleFeatureBuilder featureBuilder = new SimpleFeatureBuilder(rawsFeatureType);
-            List<SimpleFeature> newFeatures = new ArrayList<SimpleFeature>();
-
-            for(RAWSFeature RAWSFeature : rawsFeatures) {
-                SimpleFeature simpleFeature = rawsFeatureFactory.buildFeature(RAWSFeature, featureBuilder);
-                newFeatures.add(simpleFeature);
-                Filter filter = CQL.toFilter("station_id = '" + RAWSFeature.getRawsObservations().getStationId() + "'");
-                featureStore.removeFeatures(filter);
-                if(newFeatures.size()%100 == 0)
-                    logger.debug(String.format("So far processed %d features", newFeatures.size()));
+            for(RAWSFeature rawsFeature : rawsFeatures) {
+                if(this.persistFeature(rawsFeature, featureBuilder, featureStore, transaction, rawsFeatureType))
+                    successfulFeatureUpdates++;
+                else
+                    failedFeatureUpdates++;
+                if((successfulFeatureUpdates+failedFeatureUpdates)%100 == 0)
+                    logger.debug(String.format("So far processed %d features", (successfulFeatureUpdates+failedFeatureUpdates)));
             }
-            SimpleFeatureCollection newFeatureCollection = new ListFeatureCollection(rawsFeatureType, newFeatures);
-            featureStore.addFeatures(newFeatureCollection);
-            transaction.commit();
-            logger.info(String.format("Successfully completed processing %d RAWS Features in %d ms", rawsFeatures.size(), stopwatch.elapsed(TimeUnit.MILLISECONDS)));
         } catch(Exception e) {
             logger.error(String.format("Failed to process RAWS features successfully, ran for %d ms before failing", stopwatch.elapsed(TimeUnit.MILLISECONDS)), e);
+            if(transaction != null)
+                transaction.rollback();
         } finally {
             if(transaction != null)
                 transaction.close();
+        }
+        logger.info(String.format("Successfully completed processing %d RAWS Features & Failed to process %d RAWS Features in %d ms", successfulFeatureUpdates, failedFeatureUpdates, stopwatch.elapsed(TimeUnit.MILLISECONDS)));
+    }
+
+    public boolean persistFeature(RAWSFeature rawsFeature, SimpleFeatureBuilder featureBuilder, SimpleFeatureStore featureStore, DefaultTransaction transaction, SimpleFeatureType rawsFeatureType) throws Exception {
+        try {
+            SimpleFeature simpleFeature = rawsFeatureFactory.buildFeature(rawsFeature, featureBuilder);
+            List<SimpleFeature> newFeatures = new ArrayList<SimpleFeature>();
+            newFeatures.add(simpleFeature);
+            SimpleFeatureCollection newFeatureCollection = new ListFeatureCollection(rawsFeatureType, newFeatures);
+            Filter filter = CQL.toFilter("station_id = '" + rawsFeature.getRawsObservations().getStationId() + "'");
+            featureStore.removeFeatures(filter);
+            featureStore.addFeatures(newFeatureCollection);
+            transaction.commit();
+            return true;
+        } catch(RuntimeException e) {
+            throw e;
+        } catch(Exception e) {
+            logger.error(String.format("Failed to persist updates for %s, Error Details: ", rawsFeature.getRawsObservations()), e);
+            transaction.rollback();
+            return false;
         }
     }
 }

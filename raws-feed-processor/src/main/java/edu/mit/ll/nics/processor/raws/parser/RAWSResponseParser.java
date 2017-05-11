@@ -1,7 +1,6 @@
 package edu.mit.ll.nics.processor.raws.parser;
 
 import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.*;
 import edu.mit.ll.nics.processor.raws.model.RAWSResponse;
 

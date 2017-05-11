@@ -11,9 +11,11 @@ import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.geometry.jts.JTS;
 import org.geotools.referencing.CRS;
 import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.geometry.MismatchedDimensionException;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
+import org.opengis.referencing.operation.TransformException;
 
 import java.sql.Timestamp;
 
@@ -43,7 +45,7 @@ public class RAWSFeatureFactory {
         });
     }
 
-    private com.vividsolutions.jts.geom.Point createGeom(RAWSFeatureGeometry RAWSFeatureGeometry) throws Exception {
+    private com.vividsolutions.jts.geom.Point createGeom(RAWSFeatureGeometry RAWSFeatureGeometry) throws FactoryException, MismatchedDimensionException, TransformException {
         Coordinate pointCoordinates = new Coordinate(RAWSFeatureGeometry.getCoordinates().get(0), RAWSFeatureGeometry.getCoordinates().get(1));
         Point point = geometryFactory.createPoint(pointCoordinates);
         MathTransform transform = CRS.findMathTransform(sourceCRS, targetCRS, false);

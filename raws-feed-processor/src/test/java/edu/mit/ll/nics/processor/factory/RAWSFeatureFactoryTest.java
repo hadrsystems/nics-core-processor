@@ -28,7 +28,6 @@ public class RAWSFeatureFactoryTest {
     private final SimpleFeature simpleFeature = mock(SimpleFeature.class);
     private final Clock clock = mock(Clock.class);
     private final Date currentDate = new Date();
-    private Timestamp currentTimestamp = new Timestamp(currentDate.getTime());
 
     private RAWSFeatureFactory rawsFeatureFactory;
 

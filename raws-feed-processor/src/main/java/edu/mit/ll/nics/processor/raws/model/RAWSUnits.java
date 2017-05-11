@@ -1,9 +1,6 @@
 package edu.mit.ll.nics.processor.raws.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import java.io.IOException;
 
 public class RAWSUnits {
     @JsonProperty("air_temp")

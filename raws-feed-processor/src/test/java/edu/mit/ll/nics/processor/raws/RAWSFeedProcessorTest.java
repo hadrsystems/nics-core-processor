@@ -29,6 +29,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.times;
 
 public class RAWSFeedProcessorTest {
 
@@ -39,10 +40,10 @@ public class RAWSFeedProcessorTest {
 
     private final DataStore dataStore = mock(DataStore.class);
     private final SimpleFeatureSource featureSourceReadOnly = mock(SimpleFeatureSource.class);
-    private final SimpleFeatureStore featureStore = mock(SimpleFeatureStore.class);
+    private SimpleFeatureStore featureStore;
     private final SimpleFeatureType rawsFeatureType = mock(SimpleFeatureType.class);
-    private final SimpleFeatureBuilder simpleFeatureBuilder = mock(SimpleFeatureBuilder.class);
     private final SimpleFeature simpleFeature1 = mock(SimpleFeature.class);
+    private final SimpleFeature simpleFeature2 = mock(SimpleFeature.class);
 
     private RAWSFeedProcessor rawsFeedProcessor;
     private final Exchange exchange = mock(Exchange.class);
@@ -57,6 +58,7 @@ public class RAWSFeedProcessorTest {
         dataStoreManager = mock(DataStoreManager.class);
         response = mock(RAWSResponse.class);
         rawsFeedProcessor = new RAWSFeedProcessor(dataStoreManager, rawsFeatureSource, rawsResponseParser, rawsFeatureFactory);
+        featureStore = mock(SimpleFeatureStore.class);
         when(exchange.getIn()).thenReturn(message);
         when(message.getBody(String.class)).thenReturn(testGeoJson);
         when(rawsResponseParser.parse(testGeoJson)).thenReturn(response);
@@ -96,13 +98,7 @@ public class RAWSFeedProcessorTest {
         RAWSObservations rawsObservations1 = new RAWSObservations("ACTIVE", "POSITIVE", "POSITIVE VIBES", "CA",
                 62.0,10.0,2.0,4.0,238.0,10.0,new Timestamp(new Date().getTime()),"http://test-station.com/more-observations/POSITIVE");
         RAWSFeature rawsFeature1 = new RAWSFeature(rawsFeatureGeometry1, "Feature", rawsObservations1);
-
-//        RAWSFeatureGeometry rawsFeatureGeometry2 = new RAWSFeatureGeometry("Point", Arrays.asList(-100.0, 12.0));
-//        RAWSObservations rawsObservations2 = new RAWSObservations("INACTIVE", "HAPPY", "HAPPY VIBES", "CA",
-//                12,11,1,0,18,7,new Timestamp(new Date().getTime()),"http://test-station.com/more-observations/HAPPY");
-//        RAWSFeature rawsFeature2 = new RAWSFeature(rawsFeatureGeometry2, rawsObservations2);
         List<RAWSFeature> rawsFeatures = Arrays.asList(rawsFeature1);//, rawsFeature2);
-        RAWSUnits units = new RAWSUnits();
         Filter filter = CQL.toFilter("station_id = '" + rawsFeature1.getRawsObservations().getStationId() + "'");
 
         when(response.hasErrors()).thenReturn(false);
@@ -115,5 +111,65 @@ public class RAWSFeedProcessorTest {
         verify(featureStore).setTransaction(any(DefaultTransaction.class));
         verify(featureStore).removeFeatures(eq(filter));
         verify(featureStore).addFeatures(any(ListFeatureCollection.class));
+    }
+
+    @Test
+    public void testWhenFailsToBuildSimpleFeatureContinuesToProcessRemainingFeatures()  throws Exception {
+        RAWSFeatureGeometry rawsFeatureGeometry1 = new RAWSFeatureGeometry("Point", Arrays.asList(-121.0, 36.0));
+        RAWSObservations rawsObservations1 = new RAWSObservations("ACTIVE", "NOT INTERESTING", "NOT INTERESTING VIBES", "CA",
+                62.0,10.0,2.0,4.0,238.0,10.0,new Timestamp(new Date().getTime()),"http://test-station.com/more-observations/NOTINTERESTING");
+        RAWSFeature rawsFeature1 = new RAWSFeature(rawsFeatureGeometry1, "Feature", rawsObservations1);
+        Filter filter = CQL.toFilter("station_id = '" + rawsFeature1.getRawsObservations().getStationId() + "'");
+
+        RAWSFeatureGeometry rawsFeatureGeometry2 = new RAWSFeatureGeometry("Point", Arrays.asList(-121.0, 36.0));
+        RAWSObservations rawsObservations2 = new RAWSObservations("ACTIVE", "POSITIVE", "POSITIVE VIBES", "CA",
+                62.0,10.0,2.0,4.0,238.0,10.0,new Timestamp(new Date().getTime()),"http://test-station.com/more-observations/POSITIVE");
+        RAWSFeature rawsFeature2 = new RAWSFeature(rawsFeatureGeometry2, "Feature", rawsObservations2);
+        Filter filter2 = CQL.toFilter("station_id = '" + rawsFeature2.getRawsObservations().getStationId() + "'");
+
+        List<RAWSFeature> rawsFeatures = Arrays.asList(rawsFeature1, rawsFeature2);
+
+        when(response.hasErrors()).thenReturn(false);
+        when(response.getRAWSFeatures()).thenReturn(rawsFeatures);
+        when(dataStoreManager.getInstance()).thenReturn(dataStore);
+        when(dataStore.getFeatureSource(rawsFeatureSource)).thenReturn(featureStore);
+        when(featureStore.getSchema()).thenReturn(rawsFeatureType);
+        when(rawsFeatureFactory.buildFeature(eq(rawsFeature1), any(SimpleFeatureBuilder.class))).thenThrow(new Exception("Test error"));
+        when(rawsFeatureFactory.buildFeature(eq(rawsFeature2), any(SimpleFeatureBuilder.class))).thenReturn(simpleFeature2);
+        rawsFeedProcessor.process(exchange);
+        verify(featureStore).setTransaction(any(DefaultTransaction.class));
+        verify(featureStore, never()).removeFeatures(eq(filter));
+        verify(featureStore).removeFeatures(eq(filter2));
+        verify(featureStore, times(1)).addFeatures(any(ListFeatureCollection.class));
+    }
+
+    @Test
+    public void testWhenFeaturePersistOperationThrowsRuntimeExceptionFailsProcessRemainingFeatures() throws Exception {
+        RAWSFeatureGeometry rawsFeatureGeometry1 = new RAWSFeatureGeometry("Point", Arrays.asList(-121.0, 36.0));
+        RAWSObservations rawsObservations1 = new RAWSObservations("ACTIVE", "NOT INTERESTING", "NOT INTERESTING VIBES", "CA",
+                62.0,10.0,2.0,4.0,238.0,10.0,new Timestamp(new Date().getTime()),"http://test-station.com/more-observations/NOTINTERESTING");
+        RAWSFeature rawsFeature1 = new RAWSFeature(rawsFeatureGeometry1, "Feature", rawsObservations1);
+        Filter filter = CQL.toFilter("station_id = '" + rawsFeature1.getRawsObservations().getStationId() + "'");
+
+        RAWSFeatureGeometry rawsFeatureGeometry2 = new RAWSFeatureGeometry("Point", Arrays.asList(-121.0, 36.0));
+        RAWSObservations rawsObservations2 = new RAWSObservations("ACTIVE", "POSITIVE", "POSITIVE VIBES", "CA",
+                62.0,10.0,2.0,4.0,238.0,10.0,new Timestamp(new Date().getTime()),"http://test-station.com/more-observations/POSITIVE");
+        RAWSFeature rawsFeature2 = new RAWSFeature(rawsFeatureGeometry2, "Feature", rawsObservations2);
+        Filter filter2 = CQL.toFilter("station_id = '" + rawsFeature2.getRawsObservations().getStationId() + "'");
+
+        List<RAWSFeature> rawsFeatures = Arrays.asList(rawsFeature1, rawsFeature2);
+
+        when(response.hasErrors()).thenReturn(false);
+        when(response.getRAWSFeatures()).thenReturn(rawsFeatures);
+        when(dataStoreManager.getInstance()).thenReturn(dataStore);
+        when(dataStore.getFeatureSource(rawsFeatureSource)).thenReturn(featureStore);
+        when(featureStore.getSchema()).thenReturn(rawsFeatureType);
+        when(rawsFeatureFactory.buildFeature(eq(rawsFeature1), any(SimpleFeatureBuilder.class))).thenReturn(simpleFeature1);
+        when(featureStore.addFeatures(any(ListFeatureCollection.class))).thenThrow(new RuntimeException("Test exception"));
+        rawsFeedProcessor.process(exchange);
+        verify(featureStore).setTransaction(any(DefaultTransaction.class));
+        verify(featureStore).removeFeatures(eq(filter));
+        verify(featureStore, never()).removeFeatures(eq(filter2));
+        verify(rawsFeatureFactory, never()).buildFeature(eq(rawsFeature2), any(SimpleFeatureBuilder.class));
     }
 }

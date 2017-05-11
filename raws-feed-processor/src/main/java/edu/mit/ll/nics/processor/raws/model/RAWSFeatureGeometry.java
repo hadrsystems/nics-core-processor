@@ -1,6 +1,5 @@
 package edu.mit.ll.nics.processor.raws.model;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.ArrayList;
 import java.util.List;

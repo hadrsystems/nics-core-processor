@@ -124,4 +124,10 @@ public class RAWSObservations {
         description.append(String.format("<b>Humidity:              %s &#37; </b><br>", (this.getRelativeHumidity() == null) ? "N/A" : this.getRelativeHumidity().toString()));
         return description.toString();
     }
+
+    public String toString() {
+        return String.format("[Station Id: %s, Station Name: %s, Station Status: %s, State: %s, Air Temperature: %f, Dew Point: %f, " +
+                "Wind Speed: %f, Wind Gust: %f, Wind Direction: %f, Relative Humidity: %f]", this.getStationId(), this.getStationName(), this.getStatus(), this.getState(),
+                                        this.getAirTemperature(), this.getDewPointTemperature(), this.getWindSpeed(), this.getWindGust(), this.getWindDirection(), this.getRelativeHumidity());
+    }
 }

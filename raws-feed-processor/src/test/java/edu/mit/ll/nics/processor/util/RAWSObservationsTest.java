@@ -1,6 +1,5 @@
 package edu.mit.ll.nics.processor.util;
 
-import edu.mit.ll.nics.processor.raws.model.RAWSFeature;
 import edu.mit.ll.nics.processor.raws.model.RAWSObservations;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
@@ -12,8 +11,6 @@ import java.util.Date;
 import java.util.TimeZone;
 
 public class RAWSObservationsTest {
-
-    private CompassDirectionConverter compassDirectionConverter = new CompassDirectionConverter();
     private static final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm z");
     private static final SimpleDateFormat timeFormatInUTC = new SimpleDateFormat("HH:mm z");
 

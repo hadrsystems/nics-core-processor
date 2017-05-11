@@ -1,13 +1,9 @@
 package edu.mit.ll.nics.processor.raws.model;
 
 import junit.framework.Assert;
-import org.geotools.data.FeatureSource;
-import org.geotools.data.FeatureStore;
 import org.testng.annotations.Test;
 
 public class RAWSResponseTest {
-
-    RAWSResponse rawsResponse;
 
     @Test
     public void verifyNoErrors() {

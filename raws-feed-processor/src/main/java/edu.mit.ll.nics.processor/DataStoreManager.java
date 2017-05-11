@@ -81,11 +81,6 @@ public class DataStoreManager {
         dataStore = DataStoreFinder.getDataStore(datastoreParams);
     }
 
-    private void disposeDataStore() {
-        if(dataStore != null)
-            dataStore.dispose();
-    }
-
     private boolean isBlank(String str) {
         return str == null || str.trim().length() == 0;
     }

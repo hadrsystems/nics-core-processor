@@ -44,7 +44,7 @@ public class RAWSResponse {
     public List<RAWSFeature> getRAWSFeatures() { return RAWSFeatures; }
 
     public boolean hasErrors() {
-        return this.RAWSSummary != null && this.RAWSSummary.getResponseCode() != null && this.RAWSSummary.getResponseCode() != RESPONSE_CODE_NO_ERRORS && this.RAWSSummary.getResponseCode() != RESPONSE_CODE_ZERO_RESULTS;
+        return this.RAWSSummary != null && this.RAWSSummary.getResponseCode() != null && !this.RAWSSummary.getResponseCode().equals(RESPONSE_CODE_NO_ERRORS) && !this.RAWSSummary.getResponseCode().equals(RESPONSE_CODE_ZERO_RESULTS);
     }
 
     public String toString() {
