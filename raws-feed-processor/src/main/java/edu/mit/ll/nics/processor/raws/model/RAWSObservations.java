@@ -8,6 +8,7 @@ import edu.mit.ll.nics.processor.util.CompassDirectionConverter;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.TimeZone;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class RAWSObservations {
@@ -36,7 +37,12 @@ public class RAWSObservations {
     private String moreObservationsUrl;
 
     private static final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm z");
+    private static final SimpleDateFormat timeFormatInUTC = new SimpleDateFormat("HH:mm z");
     private static CompassDirectionConverter compassDirectionConverter = new CompassDirectionConverter();
+
+    static{
+        timeFormatInUTC.setTimeZone(TimeZone.getTimeZone("UTC"));
+    }
 
     public RAWSObservations() {}
 
@@ -110,7 +116,7 @@ public class RAWSObservations {
 
     public String getDescription() {
         StringBuilder description = new StringBuilder(String.format("<br><b>%s</b> %s %s<br>", this.getStationName(), this.getStationId(), this.getStatus()));
-        description.append(String.format("<b>%s</b><br>", simpleDateFormat.format(this.getLastObservationAt())));
+        description.append(String.format("<b>%s  %s</b><br>", simpleDateFormat.format(this.getLastObservationAt()), timeFormatInUTC.format(this.getLastObservationAt())));
         description.append(String.format("<b>Wind:                  %s %s MPH</b><br>", this.getCompassDirection(), (this.getWindSpeed() == null) ? "N/A" : this.getWindSpeed().toString()));
         description.append(String.format("<b>Wind Gust:                  %s MPH</b><br>", (this.getWindGust() == null) ? "N/A" : this.getWindGust().toString()));
         description.append(String.format("<b>Temperature:           %s &#8457;</b><br>", (this.getAirTemperature() == null) ? "N/A" : this.getAirTemperature().toString()));
