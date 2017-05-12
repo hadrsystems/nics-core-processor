@@ -1,3 +1,4 @@
+#!/bin/bash
 #
 # Copyright (c) 2008-2016, Massachusetts Institute of Technology (MIT)
 # All rights reserved.
