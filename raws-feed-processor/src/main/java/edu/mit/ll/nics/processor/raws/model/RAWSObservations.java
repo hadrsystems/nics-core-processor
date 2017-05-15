@@ -36,11 +36,12 @@ public class RAWSObservations {
     @JsonProperty("more_observations")
     private String moreObservationsUrl;
 
-    private static final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm z");
+    private static final SimpleDateFormat simpleDateFormatInPDT = new SimpleDateFormat("yyyy-MM-dd HH:mm z");
     private static final SimpleDateFormat timeFormatInUTC = new SimpleDateFormat("HH:mm z");
     private static final CompassDirectionConverter compassDirectionConverter = new CompassDirectionConverter();
 
     static{
+        simpleDateFormatInPDT.setTimeZone(TimeZone.getTimeZone("PDT"));
         timeFormatInUTC.setTimeZone(TimeZone.getTimeZone("UTC"));
     }
 
@@ -116,12 +117,12 @@ public class RAWSObservations {
 
     public String getDescription() {
         StringBuilder description = new StringBuilder(String.format("<br><b>%s</b> %s %s<br>", this.getStationName(), this.getStationId(), this.getStatus()));
-        description.append(String.format("<b>%s  %s</b><br>", simpleDateFormat.format(this.getLastObservationAt()), timeFormatInUTC.format(this.getLastObservationAt())));
-        description.append(String.format("<b>Wind:                  %s %s MPH</b><br>", this.getCompassDirection(), (this.getWindSpeed() == null) ? "N/A" : this.getWindSpeed().toString()));
-        description.append(String.format("<b>Wind Gust:                  %s MPH</b><br>", (this.getWindGust() == null) ? "N/A" : this.getWindGust().toString()));
-        description.append(String.format("<b>Temperature:           %s &#8457;</b><br>", (this.getAirTemperature() == null) ? "N/A" : this.getAirTemperature().toString()));
-        description.append(String.format("<b>Dew Point:             %s &#8457;</b><br>", (this.getDewPointTemperature() == null) ? "N/A" : this.getDewPointTemperature().toString()));
-        description.append(String.format("<b>Humidity:              %s &#37; </b><br>", (this.getRelativeHumidity() == null) ? "N/A" : this.getRelativeHumidity().toString()));
+        description.append(String.format("<b>%s  %s</b><br>", simpleDateFormatInPDT.format(this.getLastObservationAt()), timeFormatInUTC.format(this.getLastObservationAt())));
+        description.append(String.format("<b>Wind:</b>                  %s %s MPH<br>", this.getCompassDirection(), (this.getWindSpeed() == null) ? "N/A" : this.getWindSpeed().toString()));
+        description.append(String.format("<b>Peak Gust:</b>                  %s MPH<br>", (this.getWindGust() == null) ? "N/A" : this.getWindGust().toString()));
+        description.append(String.format("<b>Temperature:</b>           %s &#8457;<br>", (this.getAirTemperature() == null) ? "N/A" : this.getAirTemperature().toString()));
+        description.append(String.format("<b>Dew Point:</b>             %s &#8457;<br>", (this.getDewPointTemperature() == null) ? "N/A" : this.getDewPointTemperature().toString()));
+        description.append(String.format("<b>Humidity:</b>              %s &#37;<br>", (this.getRelativeHumidity() == null) ? "N/A" : this.getRelativeHumidity().toString()));
         return description.toString();
     }
 
