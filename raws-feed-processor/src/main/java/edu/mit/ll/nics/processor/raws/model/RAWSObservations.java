@@ -41,7 +41,7 @@ public class RAWSObservations {
     private static final CompassDirectionConverter compassDirectionConverter = new CompassDirectionConverter();
 
     static{
-        simpleDateFormatInPDT.setTimeZone(TimeZone.getTimeZone("PDT"));
+        simpleDateFormatInPDT.setTimeZone(TimeZone.getTimeZone("PST"));
         timeFormatInUTC.setTimeZone(TimeZone.getTimeZone("UTC"));
     }
 

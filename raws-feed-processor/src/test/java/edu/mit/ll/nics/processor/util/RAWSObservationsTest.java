@@ -17,7 +17,7 @@ public class RAWSObservationsTest {
 
     @BeforeClass
     public void setupClass() {
-        simpleDateFormatInPDT.setTimeZone(TimeZone.getTimeZone("PDT"));
+        simpleDateFormatInPDT.setTimeZone(TimeZone.getTimeZone("PST"));
         timeFormatInUTC.setTimeZone(TimeZone.getTimeZone("UTC"));
     }
 
