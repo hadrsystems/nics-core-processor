@@ -23,7 +23,7 @@ public class RAWSObservationsTest {
 
     @Test
     public void testDescription() {
-        RAWSObservations rawsObservations = new RAWSObservations("ACTIVE", "SNVC", "SAMPLE NONE VAN CAR", "CA", 92.5, 78.0, 12.0,4.0,134.0,10.0,new Timestamp(new Date().getTime()), "http://test-site-with-more-observations");
+        RAWSObservations rawsObservations = new RAWSObservations("ACTIVE", "SNVC", "SAMPLE NONE VAN CAR", "CA", 92.5, 78.9, 12.1,4.0,134.0,10.0,new Timestamp(new Date().getTime()), "http://test-site-with-more-observations");
         Assert.assertEquals(rawsObservations.getDescription(), this.getDescription(rawsObservations));
     }
 
@@ -36,11 +36,13 @@ public class RAWSObservationsTest {
     private String getDescription(RAWSObservations rawsFeature) {
         StringBuilder description = new StringBuilder(String.format("<br><b>%s</b> %s %s<br>", rawsFeature.getStationName(), rawsFeature.getStationId(), rawsFeature.getStatus()));
         description.append(String.format("<b>%s  %s</b><br>", simpleDateFormatInPDT.format(rawsFeature.getLastObservationAt()), timeFormatInUTC.format(rawsFeature.getLastObservationAt())));
-        description.append(String.format("<b>Wind:</b>                  %s %s MPH<br>", rawsFeature.getCompassDirection(), (rawsFeature.getWindSpeed() == null) ? "N/A" : rawsFeature.getWindSpeed().toString()));
-        description.append(String.format("<b>Peak Gust:</b>                  %s MPH<br>", (rawsFeature.getWindGust() == null) ? "N/A" : rawsFeature.getWindGust().toString()));
-        description.append(String.format("<b>Temperature:</b>           %s &#8457;<br>", (rawsFeature.getAirTemperature() == null) ? "N/A" : rawsFeature.getAirTemperature().toString()));
-        description.append(String.format("<b>Dew Point:</b>             %s &#8457;<br>", (rawsFeature.getDewPointTemperature() == null) ? "N/A" : rawsFeature.getDewPointTemperature().toString()));
-        description.append(String.format("<b>Humidity:</b>              %s &#37;<br>", (rawsFeature.getRelativeHumidity() == null) ? "N/A" : rawsFeature.getRelativeHumidity().toString()));
+        description.append(String.format("<b>Wind:</b>                  %s %s MPH<br>", rawsFeature.getCompassDirection(), this.getObservationForDescription(rawsFeature.getWindSpeed())));
+        description.append(String.format("<b>Peak Gust:</b>                  %s MPH<br>", this.getObservationForDescription(rawsFeature.getWindGust())));
+        description.append(String.format("<b>Temperature:</b>           %s &#8457;<br>", this.getObservationForDescription(rawsFeature.getAirTemperature())));
+        description.append(String.format("<b>Dew Point:</b>             %s &#8457;<br>", this.getObservationForDescription(rawsFeature.getDewPointTemperature())));
+        description.append(String.format("<b>Humidity:</b>              %s &#37;<br>", this.getObservationForDescription(rawsFeature.getRelativeHumidity())));
         return description.toString();
     }
+
+    public String getObservationForDescription(Double observationValue) { return (observationValue == null) ? "N/A" : Long.toString(Math.round(observationValue)); }
 }
