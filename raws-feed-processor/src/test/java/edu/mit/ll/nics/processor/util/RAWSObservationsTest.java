@@ -24,14 +24,12 @@ public class RAWSObservationsTest {
     @Test
     public void testDescription() {
         RAWSObservations rawsObservations = new RAWSObservations("ACTIVE", "SNVC", "SAMPLE NONE VAN CAR", "CA", 92.5, 78.9, 12.1,4.0,134.0,10.0,new Timestamp(new Date().getTime()), "http://test-site-with-more-observations");
-        System.out.println(rawsObservations.getDescription());
         Assert.assertEquals(rawsObservations.getDescription(), this.getDescription(rawsObservations));
     }
 
     @Test
     public void testDescriptionWithNulls() {
         RAWSObservations rawsObservations = new RAWSObservations("INACTIVE", "SNVC", "SAMPLE NONE VAN CAR", "CA", null, null, null,null,null,null,new Timestamp(new Date().getTime()), "http://test-site-with-more-observations");
-        System.out.println(rawsObservations.getDescription());
         Assert.assertEquals(rawsObservations.getDescription(), this.getDescription(rawsObservations));
     }
 
