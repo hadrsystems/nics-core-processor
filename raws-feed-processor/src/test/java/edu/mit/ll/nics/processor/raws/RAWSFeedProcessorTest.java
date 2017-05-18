@@ -119,7 +119,7 @@ public class RAWSFeedProcessorTest {
         RAWSObservations rawsObservations1 = new RAWSObservations("ACTIVE", "NOT INTERESTING", "NOT INTERESTING VIBES", "CA",
                 62.0,10.0,2.0,4.0,238.0,10.0,new Timestamp(new Date().getTime()),"http://test-station.com/more-observations/NOTINTERESTING");
         RAWSFeature rawsFeature1 = new RAWSFeature(rawsFeatureGeometry1, "Feature", rawsObservations1);
-        Filter filter = CQL.toFilter("station_id = '" + rawsFeature1.getRawsObservations().getStationId() + "'");
+        Filter filter1 = CQL.toFilter("station_id = '" + rawsFeature1.getRawsObservations().getStationId() + "'");
 
         RAWSFeatureGeometry rawsFeatureGeometry2 = new RAWSFeatureGeometry("Point", Arrays.asList(-121.0, 36.0));
         RAWSObservations rawsObservations2 = new RAWSObservations("ACTIVE", "POSITIVE", "POSITIVE VIBES", "CA",
@@ -138,7 +138,7 @@ public class RAWSFeedProcessorTest {
         when(rawsFeatureFactory.buildFeature(eq(rawsFeature2), any(SimpleFeatureBuilder.class))).thenReturn(simpleFeature2);
         rawsFeedProcessor.process(exchange);
         verify(featureStore).setTransaction(any(DefaultTransaction.class));
-        verify(featureStore, never()).removeFeatures(eq(filter));
+        verify(featureStore).removeFeatures(eq(filter1));
         verify(featureStore).removeFeatures(eq(filter2));
         verify(featureStore, times(1)).addFeatures(any(ListFeatureCollection.class));
     }
@@ -176,7 +176,7 @@ public class RAWSFeedProcessorTest {
     @Test
     public void testFeatureIsRemovedWhenStationStatusIsInactive () throws Exception {
         RAWSFeatureGeometry rawsFeatureGeometry1 = new RAWSFeatureGeometry("Point", Arrays.asList(-121.0, 36.0));
-        RAWSObservations rawsObservations1 = new RAWSObservations("INACTIVE", "NOT INTERESTING", "NOT INTERESTING VIBES", "CA",
+        RAWSObservations rawsObservations1 = new RAWSObservations("INACTIVE", "INTERESTING BUT INACTIVE", "NOT INTERESTING VIBES", "CA",
                 62.0,10.0,2.0,4.0,238.0,10.0,new Timestamp(new Date().getTime()),"http://test-station.com/more-observations/NOTINTERESTING");
         RAWSFeature rawsFeature1 = new RAWSFeature(rawsFeatureGeometry1, "Feature", rawsObservations1);
         Filter filter = CQL.toFilter("station_id = '" + rawsFeature1.getRawsObservations().getStationId() + "'");
