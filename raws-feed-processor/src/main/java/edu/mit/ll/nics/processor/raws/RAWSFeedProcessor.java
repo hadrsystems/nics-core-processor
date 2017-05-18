@@ -20,7 +20,6 @@ import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.filter.Filter;
 
-import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
@@ -80,7 +79,7 @@ public class RAWSFeedProcessor implements Processor {
             SimpleFeatureType rawsFeatureType = featureStore.getSchema();
             SimpleFeatureBuilder featureBuilder = new SimpleFeatureBuilder(rawsFeatureType);
             for(RAWSFeature rawsFeature : rawsFeatures) {
-                if(this.persistFeature(rawsFeature, featureBuilder, featureStore, transaction, rawsFeatureType))
+                if(this.updateFeature(rawsFeature, featureBuilder, featureStore, transaction, rawsFeatureType))
                     successfulFeatureUpdates++;
                 else
                     failedFeatureUpdates++;
@@ -98,15 +97,13 @@ public class RAWSFeedProcessor implements Processor {
         logger.info(String.format("Successfully completed processing %d RAWS Features & Failed to process %d RAWS Features in %d ms", successfulFeatureUpdates, failedFeatureUpdates, stopwatch.elapsed(TimeUnit.MILLISECONDS)));
     }
 
-    public boolean persistFeature(RAWSFeature rawsFeature, SimpleFeatureBuilder featureBuilder, SimpleFeatureStore featureStore, DefaultTransaction transaction, SimpleFeatureType rawsFeatureType) throws Exception {
+    public boolean updateFeature(RAWSFeature rawsFeature, SimpleFeatureBuilder featureBuilder, SimpleFeatureStore featureStore, DefaultTransaction transaction, SimpleFeatureType rawsFeatureType) throws Exception {
         try {
-            SimpleFeature simpleFeature = rawsFeatureFactory.buildFeature(rawsFeature, featureBuilder);
-            List<SimpleFeature> newFeatures = new ArrayList<SimpleFeature>();
-            newFeatures.add(simpleFeature);
-            SimpleFeatureCollection newFeatureCollection = new ListFeatureCollection(rawsFeatureType, newFeatures);
             Filter filter = CQL.toFilter("station_id = '" + rawsFeature.getRawsObservations().getStationId() + "'");
             featureStore.removeFeatures(filter);
-            featureStore.addFeatures(newFeatureCollection);
+            if(rawsFeature.getRawsObservations().getStatus().equalsIgnoreCase("ACTIVE")) { //add feature only if station status is active
+                addFeature(rawsFeature, featureBuilder, featureStore, rawsFeatureType);
+            }
             transaction.commit();
             return true;
         } catch(RuntimeException e) {
@@ -116,5 +113,13 @@ public class RAWSFeedProcessor implements Processor {
             transaction.rollback();
             return false;
         }
+    }
+
+    public void addFeature(RAWSFeature rawsFeature, SimpleFeatureBuilder featureBuilder, SimpleFeatureStore featureStore, SimpleFeatureType rawsFeatureType) throws Exception {
+        SimpleFeature simpleFeature = rawsFeatureFactory.buildFeature(rawsFeature, featureBuilder);
+        List<SimpleFeature> newFeatures = new ArrayList<SimpleFeature>();
+        newFeatures.add(simpleFeature);
+        SimpleFeatureCollection newFeatureCollection = new ListFeatureCollection(rawsFeatureType, newFeatures);
+        featureStore.addFeatures(newFeatureCollection);
     }
 }
