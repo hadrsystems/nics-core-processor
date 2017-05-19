@@ -63,7 +63,7 @@ public class RAWSFeedProcessor implements Processor {
         }
         logger.debug(String.format("Processing %d RAWS features", rawsFeatures.size()));
         DefaultTransaction transaction = null;
-        int successfulFeatureUpdates = 0, failedFeatureUpdates = 0;
+        int successfulFeatureUpdates = 0, failedFeatureUpdates = 0, inactiveFeatures = 0;
 
         try {
             DataStore datastore = dataStoreManager.getInstance();
@@ -83,6 +83,7 @@ public class RAWSFeedProcessor implements Processor {
                     successfulFeatureUpdates++;
                 else
                     failedFeatureUpdates++;
+                if(!rawsFeature.isStationActive()) inactiveFeatures++;
                 if((successfulFeatureUpdates+failedFeatureUpdates)%100 == 0)
                     logger.debug(String.format("So far processed %d features", (successfulFeatureUpdates+failedFeatureUpdates)));
             }
@@ -94,7 +95,7 @@ public class RAWSFeedProcessor implements Processor {
             if(transaction != null)
                 transaction.close();
         }
-        logger.info(String.format("Successfully completed processing %d RAWS Features & Failed to process %d RAWS Features in %d ms", successfulFeatureUpdates, failedFeatureUpdates, stopwatch.elapsed(TimeUnit.MILLISECONDS)));
+        logger.info(String.format("Successfully completed processing %d RAWS Features, Failed to process %d RAWS Features & found %d inactive features in %d ms", successfulFeatureUpdates, failedFeatureUpdates, inactiveFeatures, stopwatch.elapsed(TimeUnit.MILLISECONDS)));
     }
 
     private boolean deleteExistingAndAddNewFeature(RAWSFeature rawsFeature, SimpleFeatureBuilder featureBuilder, SimpleFeatureStore featureStore, DefaultTransaction transaction, SimpleFeatureType rawsFeatureType) throws Exception {
