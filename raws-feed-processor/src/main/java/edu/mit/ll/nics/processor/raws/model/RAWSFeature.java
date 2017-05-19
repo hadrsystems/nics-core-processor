@@ -25,10 +25,12 @@ public class RAWSFeature {
         return rawsFeatureGeometry;
     }
 
-    public String getType() { return type;}
-
     public RAWSObservations getRawsObservations() {
         return rawsObservations;
+    }
+
+    public boolean isStationActive() {
+        return this.getRawsObservations() == null ? false : "ACTIVE".equalsIgnoreCase(this.getRawsObservations().getStatus());
     }
 
     public String toString() {

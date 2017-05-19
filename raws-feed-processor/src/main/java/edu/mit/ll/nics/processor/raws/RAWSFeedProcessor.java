@@ -79,7 +79,7 @@ public class RAWSFeedProcessor implements Processor {
             SimpleFeatureType rawsFeatureType = featureStore.getSchema();
             SimpleFeatureBuilder featureBuilder = new SimpleFeatureBuilder(rawsFeatureType);
             for(RAWSFeature rawsFeature : rawsFeatures) {
-                if(this.updateFeature(rawsFeature, featureBuilder, featureStore, transaction, rawsFeatureType))
+                if(this.deleteExistingAndAddNewFeature(rawsFeature, featureBuilder, featureStore, transaction, rawsFeatureType))
                     successfulFeatureUpdates++;
                 else
                     failedFeatureUpdates++;
@@ -97,11 +97,11 @@ public class RAWSFeedProcessor implements Processor {
         logger.info(String.format("Successfully completed processing %d RAWS Features & Failed to process %d RAWS Features in %d ms", successfulFeatureUpdates, failedFeatureUpdates, stopwatch.elapsed(TimeUnit.MILLISECONDS)));
     }
 
-    public boolean updateFeature(RAWSFeature rawsFeature, SimpleFeatureBuilder featureBuilder, SimpleFeatureStore featureStore, DefaultTransaction transaction, SimpleFeatureType rawsFeatureType) throws Exception {
+    private boolean deleteExistingAndAddNewFeature(RAWSFeature rawsFeature, SimpleFeatureBuilder featureBuilder, SimpleFeatureStore featureStore, DefaultTransaction transaction, SimpleFeatureType rawsFeatureType) throws Exception {
         try {
             Filter filter = CQL.toFilter("station_id = '" + rawsFeature.getRawsObservations().getStationId() + "'");
             featureStore.removeFeatures(filter);
-            if(rawsFeature.getRawsObservations().getStatus().equalsIgnoreCase("ACTIVE")) { //add feature only if station status is active
+            if(rawsFeature.isStationActive()) { //add feature only if station status is active
                 addFeature(rawsFeature, featureBuilder, featureStore, rawsFeatureType);
             }
             transaction.commit();
@@ -115,7 +115,7 @@ public class RAWSFeedProcessor implements Processor {
         }
     }
 
-    public void addFeature(RAWSFeature rawsFeature, SimpleFeatureBuilder featureBuilder, SimpleFeatureStore featureStore, SimpleFeatureType rawsFeatureType) throws Exception {
+    private void addFeature(RAWSFeature rawsFeature, SimpleFeatureBuilder featureBuilder, SimpleFeatureStore featureStore, SimpleFeatureType rawsFeatureType) throws Exception {
         SimpleFeature simpleFeature = rawsFeatureFactory.buildFeature(rawsFeature, featureBuilder);
         List<SimpleFeature> newFeatures = new ArrayList<SimpleFeature>();
         newFeatures.add(simpleFeature);

@@ -6,10 +6,10 @@ import java.util.List;
 
 public class RAWSResponse {
 
-    public static final String RESPONSE_CODE_NO_ERRORS = "1";
-    public static final String RESPONSE_CODE_ZERO_RESULTS = "2";
-    public static final String RESPONSE_CODE_AUTHENTICATION_ERROR = "200";
-    public static final String RESPONSE_CODE_VALIDATION_ERROR = "-1";
+    protected static final String RESPONSE_CODE_NO_ERRORS = "1";
+    protected static final String RESPONSE_CODE_ZERO_RESULTS = "2";
+    protected static final String RESPONSE_CODE_AUTHENTICATION_ERROR = "200";
+    protected static final String RESPONSE_CODE_VALIDATION_ERROR = "-1";
 
     @JsonProperty("SUMMARY")
     private RAWSSummary RAWSSummary;
@@ -22,7 +22,7 @@ public class RAWSResponse {
     public RAWSResponse() {
     }
 
-    public RAWSResponse(RAWSSummary RAWSSummary, RAWSUnits RAWSUnits, String type, List<RAWSFeature> RAWSFeatures) {
+    protected RAWSResponse(RAWSSummary RAWSSummary, RAWSUnits RAWSUnits, String type, List<RAWSFeature> RAWSFeatures) {
         this.RAWSSummary = RAWSSummary;
         this.RAWSUnits = RAWSUnits;
         this.type = type;
