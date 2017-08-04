@@ -44,6 +44,8 @@ public class RAWSResponse {
 
     @JsonProperty("SUMMARY")
     private RAWSSummary RAWSSummary;
+    @JsonProperty("QC_SUMMARY")
+    private RAWSQCSummary RAWSQCSummary;
     @JsonProperty("UNITS")
     private RAWSUnits RAWSUnits;
     private String type;
@@ -53,8 +55,9 @@ public class RAWSResponse {
     public RAWSResponse() {
     }
 
-    protected RAWSResponse(RAWSSummary RAWSSummary, RAWSUnits RAWSUnits, String type, List<RAWSFeature> RAWSFeatures) {
+    protected RAWSResponse(RAWSSummary RAWSSummary, RAWSQCSummary RAWSQCSummary, RAWSUnits RAWSUnits, String type, List<RAWSFeature> RAWSFeatures) {
         this.RAWSSummary = RAWSSummary;
+        this.RAWSQCSummary = RAWSQCSummary;
         this.RAWSUnits = RAWSUnits;
         this.type = type;
         this.RAWSFeatures = RAWSFeatures;
@@ -64,6 +67,8 @@ public class RAWSResponse {
         return RAWSSummary;
     }
 
+    public RAWSQCSummary getRAWSQCSummary() {return RAWSQCSummary;
+    }
     public RAWSUnits getRAWSUnits() {
         return RAWSUnits;
     }
