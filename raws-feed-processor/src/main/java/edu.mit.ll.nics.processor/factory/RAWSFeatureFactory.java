@@ -45,14 +45,14 @@ public class RAWSFeatureFactory {
         Point point = createGeom(sourceRAWSFeature.getRawsFeatureGeometry());
         QCStatus qcStatus = QCStatus.OK;
 
-        if (qcSummary != null && rawsObservations.getQcFlagged() == true) {
+        if (qcSummary != null && rawsObservations.getQcFlagged()) {
              qcStatus = buildQcStatus(qcSummary.getShortNames(),sourceRAWSFeature);
         }
         return featureBuilder.buildFeature("1", new Object[]{
                 rawsObservations.getStationId(), rawsObservations.getStationName(), rawsObservations.getStatus(), rawsObservations.getState(),
                 rawsObservations.getAirTemperature(), rawsObservations.getWindSpeed(), rawsObservations.getWindDirection(),
                 rawsObservations.getWindGust(), rawsObservations.getDewPointTemperature(), rawsObservations.getRelativeHumidity(),
-                rawsObservations.getMoreObservationsUrl(), buildDescription(rawsObservations.getDescription(),rawsObservations.getMoreObservationsUrl()), new Timestamp(rawsObservations.getLastObservationAt().getTime()),
+                rawsObservations.getMoreObservationsUrl(), rawsObservations.getDescription(), new Timestamp(rawsObservations.getLastObservationAt().getTime()),
                 currentTimestamp, point, qcStatus.name()
         });
     }
@@ -85,13 +85,6 @@ public class RAWSFeatureFactory {
 
         }
         return QCStatus.WARNING;
-
-    }
-
-    private String buildDescription(String featureDesc, String moreObservationsUrl)
-    {
-        return featureDesc + String.format("<br/><a href=\"%s\">More Information</a>",moreObservationsUrl);
-
 
     }
 

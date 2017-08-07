@@ -145,6 +145,8 @@ public class RAWSObservations {
         return (this.getRelativeHumidity() == null) ? "N/A" : Long.toString(Math.round(this.getRelativeHumidity())) + " &#37;";
     }
 
+
+
     public String getDescription() {
         StringBuilder description = new StringBuilder(String.format("<br><b>%s</b> %s %s<br>", this.getStationName(), this.getStationId(), this.getStatus()));
         description.append(String.format("<b>%s  %s</b><br>", simpleDateFormatInPDT.format(this.getLastObservationAt()), timeFormatInUTC.format(this.getLastObservationAt())));
@@ -153,6 +155,9 @@ public class RAWSObservations {
         description.append(String.format("<b>Temperature:</b>           %s<br>", this.getAirTemperatureForDescription()));
         description.append(String.format("<b>Dew Point:</b>             %s<br>", this.getDewPointTemperatureForDescription()));
         description.append(String.format("<b>Humidity:</b>              %s<br>", this.getRelativeHumidityForDescription()));
+        if (this.getMoreObservationsUrl() != null) {
+            description.append(String.format("<br/><a href=\"%s\">More Information</a>", this.getMoreObservationsUrl()));
+        }
         return description.toString();
     }
 

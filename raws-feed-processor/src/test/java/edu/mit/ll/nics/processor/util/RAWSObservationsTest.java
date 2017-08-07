@@ -41,7 +41,9 @@ public class RAWSObservationsTest {
         description.append(String.format("<b>Temperature:</b>           %s<br>", this.getAirTemperatureForDescription(rawsObservations.getAirTemperature())));
         description.append(String.format("<b>Dew Point:</b>             %s<br>", this.getDewPointTemperatureForDescription(rawsObservations.getDewPointTemperature())));
         description.append(String.format("<b>Humidity:</b>              %s<br>", this.getRelativeHumidityForDescription(rawsObservations.getRelativeHumidity())));
-        return description.toString();
+        if (rawsObservations.getMoreObservationsUrl() != null) {
+            description.append(String.format("<br/><a href=\"%s\">More Information</a>", rawsObservations.getMoreObservationsUrl()));
+        }return description.toString();
     }
 
     private String getWindSpeedForDescription(Double windSpeed) {
