@@ -23,13 +23,13 @@ public class RAWSObservationsTest {
 
     @Test
     public void testDescription() {
-        RAWSObservations rawsObservations = new RAWSObservations("ACTIVE", "SNVC", "SAMPLE NONE VAN CAR", "CA", 92.5, 78.9, 12.1,4.0,134.0,10.0,new Timestamp(new Date().getTime()), "http://test-site-with-more-observations");
+        RAWSObservations rawsObservations = new RAWSObservations("ACTIVE", "SNVC", "SAMPLE NONE VAN CAR", "CA", 92.5, 78.9, 12.1,4.0,134.0,10.0,new Timestamp(new Date().getTime()), "http://test-site-with-more-observations",false);
         Assert.assertEquals(rawsObservations.getDescription(), this.getDescription(rawsObservations));
     }
 
     @Test
     public void testDescriptionWithNulls() {
-        RAWSObservations rawsObservations = new RAWSObservations("INACTIVE", "SNVC", "SAMPLE NONE VAN CAR", "CA", null, null, null,null,null,null,new Timestamp(new Date().getTime()), "http://test-site-with-more-observations");
+        RAWSObservations rawsObservations = new RAWSObservations("INACTIVE", "SNVC", "SAMPLE NONE VAN CAR", "CA", null, null, null,null,null,null,new Timestamp(new Date().getTime()), "http://test-site-with-more-observations",false);
         Assert.assertEquals(rawsObservations.getDescription(), this.getDescription(rawsObservations));
     }
 
@@ -41,7 +41,9 @@ public class RAWSObservationsTest {
         description.append(String.format("<b>Temperature:</b>           %s<br>", this.getAirTemperatureForDescription(rawsObservations.getAirTemperature())));
         description.append(String.format("<b>Dew Point:</b>             %s<br>", this.getDewPointTemperatureForDescription(rawsObservations.getDewPointTemperature())));
         description.append(String.format("<b>Humidity:</b>              %s<br>", this.getRelativeHumidityForDescription(rawsObservations.getRelativeHumidity())));
-        return description.toString();
+        if (rawsObservations.getMoreObservationsUrl() != null) {
+            description.append(String.format("<br/><a href=\"%s\">More Information</a>", rawsObservations.getMoreObservationsUrl()));
+        }return description.toString();
     }
 
     private String getWindSpeedForDescription(Double windSpeed) {

@@ -8,6 +8,7 @@ import edu.mit.ll.nics.processor.util.CompassDirectionConverter;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.TimeZone;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -35,6 +36,10 @@ public class RAWSObservations {
     private Date lastObservationAt;
     @JsonProperty("more_observations")
     private String moreObservationsUrl;
+    @JsonProperty("qc_flagged")
+    private Boolean qcFlagged;
+    @JsonProperty("qc")
+    private HashMap<String, Integer[]> qcData;
 
     private static final SimpleDateFormat simpleDateFormatInPDT = new SimpleDateFormat("yyyy-MM-dd HH:mm z");
     private static final SimpleDateFormat timeFormatInUTC = new SimpleDateFormat("HH:mm z");
@@ -48,7 +53,7 @@ public class RAWSObservations {
     public RAWSObservations() {}
 
     public RAWSObservations(String status, String stationId, String stationName, String state, Double airTemperature, Double dewPointTemperature,
-                            Double windSpeed, Double windGust, Double windDirection, Double relativeHumidity, Timestamp lastObservationAt, String moreObservationsUrl) {
+                            Double windSpeed, Double windGust, Double windDirection, Double relativeHumidity, Timestamp lastObservationAt, String moreObservationsUrl, Boolean qcFlagged) {
         this.status = status;
         this.stationId = stationId;
         this.stationName = stationName;
@@ -61,6 +66,7 @@ public class RAWSObservations {
         this.relativeHumidity = relativeHumidity;
         this.lastObservationAt = lastObservationAt;
         this.moreObservationsUrl = moreObservationsUrl;
+        this.qcFlagged = qcFlagged;
     }
 
     public String getStatus() {
@@ -111,6 +117,10 @@ public class RAWSObservations {
         return moreObservationsUrl;
     }
 
+    public Boolean getQcFlagged() { return qcFlagged; }
+
+    public HashMap<String, Integer[]> getQcData() { return qcData; }
+
     public String getCompassDirection() {
         return this.getWindDirection() == null ? "" : compassDirectionConverter.getCompassDirection(this.getWindDirection());
     }
@@ -135,6 +145,8 @@ public class RAWSObservations {
         return (this.getRelativeHumidity() == null) ? "N/A" : Long.toString(Math.round(this.getRelativeHumidity())) + " &#37;";
     }
 
+
+
     public String getDescription() {
         StringBuilder description = new StringBuilder(String.format("<br><b>%s</b> %s %s<br>", this.getStationName(), this.getStationId(), this.getStatus()));
         description.append(String.format("<b>%s  %s</b><br>", simpleDateFormatInPDT.format(this.getLastObservationAt()), timeFormatInUTC.format(this.getLastObservationAt())));
@@ -143,12 +155,19 @@ public class RAWSObservations {
         description.append(String.format("<b>Temperature:</b>           %s<br>", this.getAirTemperatureForDescription()));
         description.append(String.format("<b>Dew Point:</b>             %s<br>", this.getDewPointTemperatureForDescription()));
         description.append(String.format("<b>Humidity:</b>              %s<br>", this.getRelativeHumidityForDescription()));
+        if (this.getMoreObservationsUrl() != null) {
+            description.append(String.format("<br/><a href=\"%s\">More Information</a>", this.getMoreObservationsUrl()));
+        }
         return description.toString();
     }
 
     public String toString() {
         return String.format("[Station Id: %s, Station Name: %s, Station Status: %s, State: %s, Air Temperature: %f, Dew Point: %f, " +
-                "Wind Speed: %f, Wind Gust: %f, Wind Direction: %f, Relative Humidity: %f]", this.getStationId(), this.getStationName(), this.getStatus(), this.getState(),
-                                        this.getAirTemperature(), this.getDewPointTemperature(), this.getWindSpeed(), this.getWindGust(), this.getWindDirection(), this.getRelativeHumidity());
+                "Wind Speed: %f, Wind Gust: %f, Wind Direction: %f, Relative Humidity: %f, QC Flagged?: %b]", this.getStationId(), this.getStationName(), this.getStatus(), this.getState(),
+                                        this.getAirTemperature(), this.getDewPointTemperature(), this.getWindSpeed(), this.getWindGust(), this.getWindDirection(), this.getRelativeHumidity(),
+                                        this.getQcFlagged());
     }
+
+
+
 }

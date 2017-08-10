@@ -4,6 +4,7 @@ import com.google.common.base.Stopwatch;
 import edu.mit.ll.nics.processor.DataStoreManager;
 import edu.mit.ll.nics.processor.factory.RAWSFeatureFactory;
 import edu.mit.ll.nics.processor.raws.model.RAWSFeature;
+import edu.mit.ll.nics.processor.raws.model.RAWSQCSummary;
 import edu.mit.ll.nics.processor.raws.model.RAWSResponse;
 import edu.mit.ll.nics.processor.raws.parser.RAWSResponseParser;
 import org.apache.camel.Exchange;
@@ -52,15 +53,16 @@ public class RAWSFeedProcessor implements Processor {
             logger.error(String.format("Unable to process RAWS API Response, Error Message: %s, Error Code: %s", response.getRAWSSummary().getResponseMessage(), response.getRAWSSummary().getResponseCode()));
             return;
         }
-        this.persistFeatures(response.getRAWSFeatures());
+        this.persistFeatures(response.getRAWSFeatures(),response.getRAWSQCSummary());
     }
 
-    private void persistFeatures(List<RAWSFeature> rawsFeatures) throws Exception {
+    private void persistFeatures(List<RAWSFeature> rawsFeatures, RAWSQCSummary qcSummary) throws Exception {
         Stopwatch stopwatch = Stopwatch.createStarted();
         if(rawsFeatures.size() == 0) {
             logger.info("Zero RAWS features to process, exiting current process");
             return;
         }
+
         logger.debug(String.format("Processing %d RAWS features", rawsFeatures.size()));
         DefaultTransaction transaction = null;
         int successfulFeatureUpdates = 0, failedFeatureUpdates = 0, inactiveFeatures = 0;
@@ -79,7 +81,7 @@ public class RAWSFeedProcessor implements Processor {
             SimpleFeatureType rawsFeatureType = featureStore.getSchema();
             SimpleFeatureBuilder featureBuilder = new SimpleFeatureBuilder(rawsFeatureType);
             for(RAWSFeature rawsFeature : rawsFeatures) {
-                if(this.deleteExistingAndAddNewFeature(rawsFeature, featureBuilder, featureStore, transaction, rawsFeatureType))
+                if(this.deleteExistingAndAddNewFeature(rawsFeature, featureBuilder, featureStore, transaction, rawsFeatureType,qcSummary))
                     successfulFeatureUpdates++;
                 else
                     failedFeatureUpdates++;
@@ -98,12 +100,12 @@ public class RAWSFeedProcessor implements Processor {
         logger.info(String.format("Successfully completed processing %d RAWS Features, Failed to process %d RAWS Features & found %d inactive features in %d ms", successfulFeatureUpdates, failedFeatureUpdates, inactiveFeatures, stopwatch.elapsed(TimeUnit.MILLISECONDS)));
     }
 
-    private boolean deleteExistingAndAddNewFeature(RAWSFeature rawsFeature, SimpleFeatureBuilder featureBuilder, SimpleFeatureStore featureStore, DefaultTransaction transaction, SimpleFeatureType rawsFeatureType) throws Exception {
+    private boolean deleteExistingAndAddNewFeature(RAWSFeature rawsFeature, SimpleFeatureBuilder featureBuilder, SimpleFeatureStore featureStore, DefaultTransaction transaction, SimpleFeatureType rawsFeatureType, RAWSQCSummary qcSummary) throws Exception {
         try {
             Filter filter = CQL.toFilter("station_id = '" + rawsFeature.getRawsObservations().getStationId() + "'");
             featureStore.removeFeatures(filter);
             if(rawsFeature.isStationActive()) { //add feature only if station status is active
-                addFeature(rawsFeature, featureBuilder, featureStore, rawsFeatureType);
+                addFeature(rawsFeature, featureBuilder, featureStore, rawsFeatureType,qcSummary);
             }
             transaction.commit();
             return true;
@@ -116,8 +118,9 @@ public class RAWSFeedProcessor implements Processor {
         }
     }
 
-    private void addFeature(RAWSFeature rawsFeature, SimpleFeatureBuilder featureBuilder, SimpleFeatureStore featureStore, SimpleFeatureType rawsFeatureType) throws Exception {
-        SimpleFeature simpleFeature = rawsFeatureFactory.buildFeature(rawsFeature, featureBuilder);
+    private void addFeature(RAWSFeature rawsFeature, SimpleFeatureBuilder featureBuilder, SimpleFeatureStore featureStore, SimpleFeatureType rawsFeatureType, RAWSQCSummary qcSummary) throws Exception {
+
+        SimpleFeature simpleFeature = rawsFeatureFactory.buildFeature(rawsFeature, featureBuilder,qcSummary);
         List<SimpleFeature> newFeatures = new ArrayList<SimpleFeature>();
         newFeatures.add(simpleFeature);
         SimpleFeatureCollection newFeatureCollection = new ListFeatureCollection(rawsFeatureType, newFeatures);
