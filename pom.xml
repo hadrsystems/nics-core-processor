@@ -52,7 +52,6 @@
 
 	<!-- Listing all the sub-components of the NICS codebase -->
 	<modules>
-		<module>collab-feed-manager</module>
 		<module>geodatafeed-consumer</module>
 		<module>json-pli-consumer</module>
 		<module>gst2gml</module>
