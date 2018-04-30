@@ -29,31 +29,45 @@
     OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 -->
-<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd">
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd">
 
-	<bean id="log4jInitialization" class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+	<bean id="log4jInitialization"
+		class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
 		<property name="targetClass" value="org.springframework.util.Log4jConfigurer" />
 		<property name="targetMethod" value="initLogging" />
 		<property name="arguments">
-			<list>											
+			<list>
 				<value>config/log4j.properties</value>
 			</list>
 		</property>
-	</bean>	
+	</bean>
 
 	<camelContext id="camel" xmlns="http://camel.apache.org/schema/spring">
-		
-		<propertyPlaceholder id="props" location="file:config/gst2gml.properties" />				
 
-		<route id="ProcessAircraftRoute" >
-			<from uri="{{rabbitAircraft}}" />
-			<to uri="{{airTransform}}" /> 
+		<propertyPlaceholder id="props"
+			location="file:config/gst2gml.properties" />
+		<route id="SplitGroundAndAircraftRoute">
+			<from uri="{{incomingXri}}" />
+			<when>
+				<simple>${body} regex
+					'.*UnitID="((H)+|(HT)+|(AA)+|(AT)+|(LP)+)+[0-9]+".*'</simple>
+				<to uri="seda:affout" />
+				<stop />
+			</when>
+			<to uri="seda:groundout" />
+		</route>
+
+		<route id="ProcessAircraftRoute">
+			<from uri="seda:affout" />
+			<to uri="{{airTransform}}" />
 			<to uri="{{geodatafeed}}" />
 		</route>
-		
-		<route id="ProcessGroundRoute" >
-			<from uri="{{rabbitGround}}" />
-			<to uri="{{groundTransform}}" /> 
+
+		<route id="ProcessGroundRoute">
+			<from uri="seda:groundout" />
+			<to uri="{{groundTransform}}" />
 			<to uri="{{geodatafeed}}" />
 		</route>
 

@@ -36,13 +36,13 @@ import org.apache.camel.CamelContext;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.apache.camel.ProducerTemplate;
-
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
-
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONArray;
+
+import edu.mit.ll.nics.processor.gml.GMLToDBProcessor;
 
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
@@ -100,6 +100,7 @@ public class JSONPLIProcessor implements Processor {
     private String timezoneString;
     private boolean prependOrgToName;
     private String processorClass = JSONPLIProcessor.class.getSimpleName();
+    private GMLToDBProcessor gmlToDbProcessor;
     
     private OCFAProcessor ocfaProcessor;
     
@@ -133,7 +134,10 @@ public class JSONPLIProcessor implements Processor {
         validateProcessor();
         
         LOG.info("\n!!! Finished " + JSONPLIProcessor.class.getSimpleName() + " initialization!!!\n");
-        LOG.info("\n!!! using geodatafeedConsumer endpoint: " + this.geodatafeedConsumer + "\n\n");
+        LOG.info("\n!!! Writing straight to database : " + this.gmlToDbProcessor == null ? "TRUE" : "FALSE");
+        if( this.gmlToDbProcessor != null ) {
+        	LOG.info("\n!!! using geodatafeedConsumer endpoint: " + this.geodatafeedConsumer + "\n\n");
+        }
     }
 
     /**
@@ -329,7 +333,11 @@ public class JSONPLIProcessor implements Processor {
             if(!invalidData) {
                 String gmlString = pliEntry.toXML(false);
                 LOG.debug("\n\n!!!Sending GML: \n" + gmlString + "\n\n");
-                sendToEndpoint(geodatafeedConsumer, pliEntry.toXML(false));
+                if( gmlToDbProcessor != null ) {
+                    gmlToDbProcessor.process(gmlString);	
+                } else {
+                	sendToEndpoint(geodatafeedConsumer, gmlString);
+                }
             } else {
             	LOG.warn("\nNOT sending track due to invalid data being included: " + invalidDataInfo);
             }            
@@ -563,5 +571,13 @@ public class JSONPLIProcessor implements Processor {
 
 	public void setOcfaProcessor(OCFAProcessor ocfaProcessor) {
 		this.ocfaProcessor = ocfaProcessor;
+	}
+
+	public GMLToDBProcessor getGmlToDbProcessor() {
+		return gmlToDbProcessor;
+	}
+
+	public void setGmlToDbProcessor(GMLToDBProcessor gmlToDbProcessor) {
+		this.gmlToDbProcessor = gmlToDbProcessor;
 	}
 }

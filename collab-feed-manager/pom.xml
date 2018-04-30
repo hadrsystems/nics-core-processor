@@ -143,11 +143,11 @@
 
 		<!-- NICS internal module dependencies -->
 		<dependency>
-			<groupId>edu.mit.ll.nics.common</groupId>
+			<groupId>com.tabordasolutions.nics.common</groupId>
 			<artifactId>entities</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>edu.mit.ll.nics.common</groupId>
+			<groupId>com.tabordasolutions.nics.common</groupId>
 			<artifactId>geoserver-rest-api</artifactId>
 		</dependency>
 

@@ -29,30 +29,35 @@
  */
 package edu.mit.ll.nics.processor.gml.consumer;
 
-import org.apache.camel.Exchange;
-import org.apache.camel.Processor;
-import org.apache.commons.lang.time.StopWatch;
-import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
-
+import java.io.IOException;
+import java.io.InputStream;
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
-import java.util.TimeZone;
 import java.util.regex.Pattern;
 
+import org.apache.camel.Exchange;
+import org.apache.camel.Processor;
+import org.apache.commons.lang.time.StopWatch;
+import org.apache.log4j.Logger;
+import org.apache.log4j.PropertyConfigurator;
 import org.geotools.GML;
 import org.geotools.GML.Version;
-import org.geotools.data.simple.SimpleFeatureCollection;
-import org.geotools.data.simple.SimpleFeatureIterator;
-import org.geotools.data.simple.SimpleFeatureStore;
 import org.geotools.data.DataStore;
 import org.geotools.data.DataStoreFinder;
 import org.geotools.data.DefaultTransaction;
 import org.geotools.data.Transaction;
+import org.geotools.data.simple.SimpleFeatureCollection;
+import org.geotools.data.simple.SimpleFeatureIterator;
+import org.geotools.data.simple.SimpleFeatureStore;
+import org.geotools.feature.type.Types;
+import org.geotools.filter.text.cql2.CQL;
+import org.geotools.geometry.jts.JTS;
+import org.geotools.referencing.CRS;
+import org.geotools.util.logging.Logging;
 import org.opengis.feature.IllegalAttributeException;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
@@ -62,16 +67,9 @@ import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.NoSuchAuthorityCodeException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
-import org.geotools.geometry.jts.JTS;
-import org.geotools.referencing.CRS;
-import org.geotools.util.logging.Logging;
-import org.geotools.feature.type.Types;
-import org.geotools.filter.text.cql2.CQL;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Point;
-
-import java.io.*;
 
 
 public class GMLToDBProcessor implements Processor {
@@ -132,7 +130,6 @@ public class GMLToDBProcessor implements Processor {
 	private String dateFormatPatternOp1 = "yyyy-MM-dd'T'HH:mm:ssX";
 	private String dateFormatPatternOp2 = "yyyy-MM-dd'T'HH:mm:ssXX";
 	private String dateFormatPatternOp3 = "yyyy-MM-dd'T'HH:mm:ssXXX";
-	
 	
     private String log4jPropertyFile;
 	
@@ -324,7 +321,7 @@ public class GMLToDBProcessor implements Processor {
     	
     	// Initialize the GML object to the specified version
     	gml = new GML(parseGMLVersion());
-    	
+
     	hasInitialized = true;
     	
     	return success;
@@ -373,7 +370,6 @@ public class GMLToDBProcessor implements Processor {
     @Override
     //@SuppressWarnings({"unchecked", "unchecked", "unchecked", "unchecked"})
     public void process(Exchange exchange) {
-    	
     	if(!hasInitialized && !init()) {
 			log.info("Initialization failed... shutting down.");
 			try {
@@ -463,7 +459,6 @@ public class GMLToDBProcessor implements Processor {
         	if (tsNew.after(new Timestamp(currentTimeMillis + new_feature_threshold))) { //if it's "newer" than threshold
         		throw new GdfcException("Timestamp is too far in the future and being ignored");
         	}
-        	
         	
         	//ERROR CHECK - COORDINATES
         	Point point =  (Point) feat.getDefaultGeometry();

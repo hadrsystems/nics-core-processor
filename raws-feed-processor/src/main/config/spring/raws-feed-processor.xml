@@ -1,0 +1,66 @@
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd">
+
+    <bean id="log4jInitialization" class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+        <property name="targetClass" value="org.springframework.util.Log4jConfigurer" />
+        <property name="targetMethod" value="initLogging" />
+        <property name="arguments">
+            <list>
+                <value>config/log4j.properties</value>
+            </list>
+        </property>
+    </bean>
+
+
+    <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <property name="location">
+            <value>config/raws-feed-processor.properties</value>
+        </property>
+    </bean>
+
+    <bean id="dataStoreManager" class="edu.mit.ll.nics.processor.DataStoreManager">
+        <constructor-arg index="0" value="${db.type}"/>
+        <constructor-arg index="1" value="${db.host}" />
+        <constructor-arg index="2" value="${db.port}" />
+        <constructor-arg index="3" value="${db.name}" />
+        <constructor-arg index="4" value="${db.user}" />
+        <constructor-arg index="5" value="${db.password}" />
+        <constructor-arg index="6" value="${raws.datastore.expires.in.seconds}"/>
+    </bean>
+
+    <bean id="rawsResponseParser" class="edu.mit.ll.nics.processor.raws.parser.RAWSResponseParser"/>
+    <bean id="crsFactory" class="edu.mit.ll.nics.processor.factory.CRSFactory"/>
+    <bean id="geometryFactory" class="org.geotools.geometry.jts.JTSFactoryFinder" factory-method="getGeometryFactory"/>
+    <bean id="clock" class="edu.mit.ll.nics.processor.util.Clock"/>
+
+    <bean id="rawsFeatureFactory" class="edu.mit.ll.nics.processor.factory.RAWSFeatureFactory">
+        <constructor-arg index="0" ref="geometryFactory"/>
+        <constructor-arg index="1" ref="clock"/>
+        <constructor-arg index="2" ref="crsFactory"/>
+        <constructor-arg index="3" value="${raws.source.crs}"/>
+        <constructor-arg index="4" value="${raws.target.crs}"/>
+    </bean>
+
+    <bean id="rawsFeedProcessor" class="edu.mit.ll.nics.processor.raws.RAWSFeedProcessor">
+        <!--<property name="log4jPropertyFile" value="s/log4j.properties" />-->
+        <constructor-arg index="0" ref="dataStoreManager"/>
+        <constructor-arg index="1" value="${raws.feature.source}"/>
+        <constructor-arg index="2" ref="rawsResponseParser"/>
+        <constructor-arg index="3" ref="rawsFeatureFactory"/>
+        <!--<property name="log4jInitialization" ref="log4jInitialization"/>-->
+    </bean>
+
+    <camelContext id="camel" xmlns="http://camel.apache.org/schema/spring">
+        <propertyPlaceholder id="props" location="file:config/raws-feed-processor.properties" />
+        <route id="rawsRequestAllStationsLatest">
+            <from uri="timer://ping?repeatCount=1"/>
+            <to uri="{{raws.mesowest.api.latest.all}}"/>
+            <process ref="rawsFeedProcessor"/>
+        </route>
+
+        <route id="rawsRequestLatestFromLastRun">
+            <from uri="timer://ping?fixedRate=true&amp;period={{raws.mesowest.processor.run.frequency}}&amp;delay={{raws.mesowest.processor.run.frequency}}" />
+            <to uri="{{raws.mesowest.api.latest.in.last.x.min}}"/>
+            <process ref="rawsFeedProcessor"/>
+        </route>
+    </camelContext>
+</beans>

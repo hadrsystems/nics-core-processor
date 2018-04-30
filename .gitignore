@@ -19,3 +19,5 @@ release.properties
 # intellij
 .idea/
 *.iml
+geodatafeed-consumer/config
+json-pli-consumer/config

@@ -42,6 +42,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import edu.mit.ll.nics.processor.gml.GMLToDBProcessor;
+
 /**
  * Processes OCFA AVL Feed
  * 
@@ -93,8 +95,8 @@ public class OCFAProcessor implements Processor {
     private String timezoneString;
     private boolean prependOrgToName;
     private String orgName;
-	
-	
+	private GMLToDBProcessor gmlToDbProcessor;
+
 	/**
 	 * Called by Spring once properties have been set
 	 */
@@ -106,6 +108,14 @@ public class OCFAProcessor implements Processor {
 	public void process(Exchange exchange) throws Exception {
 		
 		String strJson = exchange.getIn().getBody(String.class);
+		if (producer == null) {
+            initProducer(exchange.getContext());
+        }
+
+        process(strJson);
+	}
+	
+	public void process(String strJson) throws Exception {
 		
 		if(strJson == null) {
 			return;
@@ -207,14 +217,14 @@ public class OCFAProcessor implements Processor {
 	        pliEntry.setWfsServiceURI(wfsServiceURI);
 	        pliEntry.setWfsSchemasURI(wfsSchemasURI);
 			
-			log.info("\n====\n" + pliEntry.toXML(true) + "\n====\n");
+	        String pliString = pliEntry.toXML(false);
+			log.info("\n====\n" +  pliString + "\n====\n");
 			
-			if (producer == null) {
-	            initProducer(exchange.getContext());
-	        }
-			
-			sendToEndpoint(geodatafeedConsumer, pliEntry.toXML(false));
-		
+			if( gmlToDbProcessor != null ) {
+				gmlToDbProcessor.process(pliString);
+			} else {
+				sendToEndpoint(geodatafeedConsumer, pliString);				
+			}
 		}
 	}
 	
@@ -346,6 +356,15 @@ public class OCFAProcessor implements Processor {
 
 	public void setOrgName(String orgName) {
 		this.orgName = orgName;
+	}
+
+	
+	public GMLToDBProcessor getGmlToDbProcessor() {
+		return gmlToDbProcessor;
+	}
+
+	public void setGmlToDbProcessor(GMLToDBProcessor gmlToDbProcessor) {
+		this.gmlToDbProcessor = gmlToDbProcessor;
 	}
 
 }
